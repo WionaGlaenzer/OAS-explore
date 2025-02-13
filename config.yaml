@@ -7,15 +7,46 @@ filtering:
   max_length: 1000            # Maximum sequence length
   filter_by_region_length: true  # Filter sequences by region length
 
-# Species selection
-species:
-  include:
+# Data filtering before download
+filters:
+  Species:
     - "rabbit"
-
-# Select the publications to include
-publications:
-  include:
+  Author: # Use the publication name as it appears on OAS
     - "Banerjee et al., 2017"
+  BSource:
+    - "PBMC"
+    - "Spleen"
+  BType:
+    - "Unsorted-B-Cells"
+  Longitudinal:
+    - "no"
+    - "Terminal-bleed"
+    - "Vaccination-1"
+    - "Vaccination-2"
+    - "Vaccination-3"
+  Age:
+    - "no"
+  Disease:
+    - "None"
+    - nan
+    #- "HIV"
+    #- "CLL"
+  #Subject:
+    #- "Subject-CLL-7"
+  #Vaccine:
+    #- "None"
+    #- "HIV"
+  #Chain:
+    #- "Heavy"
+  #Unique_sequences:
+    #min: 5
+  #Isotype:
+    #- "Bulk"
+    #- "IGHA"
+  #Total_sequences:
+    #min: 5
+  #Size_MB:
+    #max: 100000
 
 # Output settings
 output:

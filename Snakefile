@@ -4,12 +4,11 @@ from data_functions import select_files
 
 rule select_files_to_download:
     output:
-        "data_to_download.txt"
+        "outputs/data_to_download.txt"
     params:
-        species = config["species"],
-        publications = config["publications"]
+        filters = config["filters"],
     run:
-        select_files(species = params.species, publications = params.publications)
+        select_files(filters = params.filters)
 
 rule download_data:
     input:

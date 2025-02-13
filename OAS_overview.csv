@@ -1,4 +1,4 @@
-Download_Link,Run,Link,Author,Species,BSource,BType,Longitudinal,Age,Disease,Subject,Vaccine,Chain,Unique sequences,Isotype,Total sequences,Size_MB
+Download_Link,Run,Link,Author,Species,BSource,BType,Longitudinal,Age,Disease,Subject,Vaccine,Chain,Unique_sequences,Isotype,Total_sequences,Size_MB
 https://opig.stats.ox.ac.uk/webapps/ngsdb/unpaired/Banerjee_2017/csv/SRR5060321_Heavy_Bulk.csv.gz,SRR5060321,https://doi.org/10.1016/j.virol.2017.02.015,"Banerjee et al., 2017",rabbit,Spleen,Unsorted-B-Cells,Terminal-bleed,no,None,no,HIV,Heavy,1671672,Bulk,2655033,7758.7092
 https://opig.stats.ox.ac.uk/webapps/ngsdb/unpaired/Banerjee_2017/csv/SRR5060321_Heavy_IGHA.csv.gz,SRR5060321,https://doi.org/10.1016/j.virol.2017.02.015,"Banerjee et al., 2017",rabbit,Spleen,Unsorted-B-Cells,Terminal-bleed,no,None,no,HIV,Heavy,3,IGHA,3,0.0146
 https://opig.stats.ox.ac.uk/webapps/ngsdb/unpaired/Banerjee_2017/csv/SRR5060322_Heavy_Bulk.csv.gz,SRR5060322,https://doi.org/10.1016/j.virol.2017.02.015,"Banerjee et al., 2017",rabbit,PBMC,Unsorted-B-Cells,Terminal-bleed,no,None,no,HIV,Heavy,136453,Bulk,199217,613.1261
