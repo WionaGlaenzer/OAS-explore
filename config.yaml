@@ -1,0 +1,31 @@
+###### Data selection #####
+# Filtering criteria
+filtering:
+  similarity_threshold: 0.9   # Remove sequences above 90% similarity
+  max_sequences: 100000       # Limit dataset to 100,000 sequences
+  min_length: 50              # Minimum sequence length
+  max_length: 1000            # Maximum sequence length
+  filter_by_region_length: true  # Filter sequences by region length
+
+# Species selection
+species:
+  include:
+    - "rabbit"
+
+# Select the publications to include
+publications:
+  include:
+    - "Banerjee et al., 2017"
+
+# Output settings
+output:
+  processed_dir: "data/processed"
+  log_dir: "logs"
+  report_file: "results/preprocessing_report.txt"
+
+# Computational settings
+resources:
+  threads: 4
+  memory: "16GB"
+
+###### Model settings #####
