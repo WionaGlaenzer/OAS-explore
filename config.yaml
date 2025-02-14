@@ -11,8 +11,10 @@ filtering:
 filters:
   Species:
     - "rabbit"
+    - "human"
   Author: # Use the publication name as it appears on OAS
     - "Banerjee et al., 2017"
+    - "Bashford et al., 2013"
   BSource:
     - "PBMC"
     - "Spleen"
@@ -26,27 +28,32 @@ filters:
     - "Vaccination-3"
   Age:
     - "no"
+    - "77"
+    - "81"
   Disease:
-    - "None"
-    - nan
-    #- "HIV"
-    #- "CLL"
-  #Subject:
-    #- "Subject-CLL-7"
-  #Vaccine:
-    #- "None"
-    #- "HIV"
-  #Chain:
-    #- "Heavy"
-  #Unique_sequences:
-    #min: 5
-  #Isotype:
-    #- "Bulk"
-    #- "IGHA"
-  #Total_sequences:
-    #min: 5
-  #Size_MB:
-    #max: 100000
+    - "no"
+    - "HIV"
+    - "CLL"
+  Subject:
+    - "Subject-CLL-7"
+    - "Subject-CLL-1"
+    - "Subject-CLL-10"
+    - "Subject-CLL-9"
+    - "no"
+  Vaccine:
+    - "no"
+    - "HIV"
+  Chain:
+    - "Heavy"
+  Unique_sequences:
+    min: 5
+  Isotype:
+    - "Bulk"
+    - "IGHA"
+  Total_sequences:
+    min: 5
+  Size_MB:
+    max: 100000
 
 # Output settings
 output:
