@@ -1,46 +1,81 @@
 #!/bin/bash
-#downloading the files from OAS
-echo "Input file: $1"
-echo "Output file: $2"
-echo "Every n-th line: $3"
 
-output_file="${2}.txt"
-# Clear the output file
+# Ensure proper usage
+if [ "$#" -ne 4 ]; then
+    echo "Usage: $0 <input_file> <output_file> <nth_line> <columns>"
+    exit 1
+fi
+
+# Parameters
+input_file="$1"
+output_file="$2"
+nth_line="$3"
+columns="$4"
+
+# Create and use a dedicated 'downloading' folder
+download_dir="downloading"
+mkdir -p "$download_dir"
+
+echo "Input file: $input_file"
+echo "Output file: $output_file"
+echo "Every n-th line: $nth_line"
+echo "Columns to keep: $columns"
+
+# Clear the output file before writing new results
 > "$output_file"
 
-column_name="sequence_alignment_aa"
-
-
 count=1
-while read -r line; do 
-    if (($count % $3 == 0)); then
-        eval $line  
-        # unzipping the files
-        files=./*
-        echo "Unzipping files"
-        for file in $files
-        do
-            #echo $(basename $file)
-            if [ "${file:${#file}-2:${#file}}" == "gz" ]; then
-            gunzip -d $(basename $file)
+
+while read -r url; do 
+    if (( count % nth_line == 0 )); then
+        echo "Downloading: $url"
+        
+        # Download file into 'downloading' directory
+        wget -P "$download_dir" "$url"
+
+        # Unzip any .gz files
+        echo "Unzipping files..."
+        for file in "$download_dir"/*.gz; do
+            if [ -f "$file" ]; then
+                gunzip "$file"
             fi
         done
-        for file in *.csv; do
-        # Check if the file exists and is readable
-        if [ -r "$file" ]; then
-                local column
-                unset column
-            # Extract the desired column and append it to the output file
-                column=$(awk -F "\"*,\"*" 'NR>2 && length($35) >= 20 && length($45)  >= 10 && length($37) >= 5 && length($37) <= 12 && length($41) <= 10 && length($41) >= 1 && length($47) >= 5 && length($47) <= 38 {print $14}' "$file")
-                if [ -n "$column" ]; then
-                    printf "%s\n" "$column" >> "$output_file"
-                fi            #printf "%s\n" $column > $output_file
-        fi
+
+        # Process CSV files
+        for file in "$download_dir"/*.csv; do
+            if [ -r "$file" ]; then
+                echo "Processing file: $(basename "$file")"
+                
+                awk -v cols="$columns" '
+                BEGIN {
+                    FS = ","  # Standard CSV delimiter
+                    OFS = ","  # Ensure output uses commas as well
+                    split(cols, colArr, ",")  # Convert user-specified columns into an array
+                }
+                function clean_field(field) {
+                    gsub(/^"|"$/, "", field)  # Remove leading/trailing quotes
+                    return field
+                }
+                NR > 2 && length($35) >= 20 && length($45) >= 10 && length($37) >= 5 && length($37) <= 12 && length($41) <= 10 && length($41) >= 1 && length($47) >= 5 && length($47) <= 38 {
+                    out = ""
+                    for (i in colArr) {
+                        field = clean_field($colArr[i])  # Clean up quotes
+                        if (out == "") {
+                            out = field  # First column (no leading comma)
+                        } else {
+                            out = out OFS field  # Append subsequent columns with commas
+                        }
+                    }
+                    print out
+                }' "$file" >> "$output_file"
+            fi
         done
-        rm -f *.csv
-        rm -f *.gz  
+
+        # Clean up downloaded files
+        rm -f "$download_dir"/*.csv
+        rm -f "$download_dir"/*.gz
     fi
     ((count++))
-done < $1
+done < "$input_file"
 
 echo "Data has been written to $output_file."

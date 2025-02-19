@@ -1,6 +1,6 @@
 import pandas as pd
 
-def select_files(filters, input_file="OAS_overview.csv", output_file="data_to_download.txt"):
+def select_files(filters, input_file="assets/OAS_overview.csv", output_file="data_to_download.csv"):
     """Filters the dataset based on the given criteria and writes download links to a file."""
     
     # Load dataset
@@ -27,6 +27,6 @@ def select_files(filters, input_file="OAS_overview.csv", output_file="data_to_do
     # Write filtered download links to output file
     with open(f"outputs/{output_file}", 'w') as f:
         for _, row in df.iterrows():
-            f.write(row['Download_Link'] + '\n')
+            f.write(row['Download_Link'] + ',' + row['File_index'], '\n')
 
     print(f"Saved {len(df)} download links to 'outputs/{output_file}'")

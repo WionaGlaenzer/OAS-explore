@@ -55,6 +55,20 @@ filters:
   Size_MB:
     max: 100000
 
+columns_to_keep:
+  - "locus"
+  - "fwr1_aa"
+  - "cdr1_aa"
+  - "fwr2_aa"
+  - "cdr2_aa"
+  - "fwr3_aa"
+  - "cdr3_aa"
+  - "fwr4_aa"
+  - "v_call"
+  - "d_call"
+  - "j_call"
+  - "ANARCI_numbering"
+
 # Output settings
 output:
   processed_dir: "data/processed"
