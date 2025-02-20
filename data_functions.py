@@ -26,7 +26,8 @@ def select_files(filters, input_file="assets/OAS_overview.csv", output_file="dat
     
     # Write filtered download links to output file
     with open(f"outputs/{output_file}", 'w') as f:
+        f.write("Download_Link,File_index\n")
         for _, row in df.iterrows():
-            f.write(row['Download_Link'] + ',' + row['File_index'], '\n')
+            f.write(f"{row['File_index']},{row['Download_Link']}\n")
 
     print(f"Saved {len(df)} download links to 'outputs/{output_file}'")

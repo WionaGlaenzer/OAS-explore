@@ -5,11 +5,12 @@ import pandas as pd
 
 rule all:
     input:
-        "outputs/sequences.csv"
+        "outputs/sequences.csv",
+        "outputs/data_to_download.csv"
 
 rule select_files_to_download:
     output:
-        "outputs/data_to_download.txt"
+        "outputs/data_to_download.csv"
     params:
         filters = config["filters"],
     run:
