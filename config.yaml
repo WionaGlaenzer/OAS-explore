@@ -12,48 +12,48 @@ filters:
   Species:
     - "rabbit"
     - "human"
-  Author: # Use the publication name as it appears on OAS
-    - "Banerjee et al., 2017"
-    - "Bashford et al., 2013"
-  BSource:
-    - "PBMC"
-    - "Spleen"
-  BType:
-    - "Unsorted-B-Cells"
-  Longitudinal:
-    - "no"
-    - "Terminal-bleed"
-    - "Vaccination-1"
-    - "Vaccination-2"
-    - "Vaccination-3"
-  Age:
-    - "no"
-    - "77"
-    - "81"
-  Disease:
-    - "no"
-    - "HIV"
-    - "CLL"
+  #Author: # Use the publication name as it appears on OAS
+    #- "Banerjee et al., 2017"
+    #- "Bashford et al., 2013"
+  #BSource:
+    #- "PBMC"
+    #- "Spleen"
+  #BType:
+    #- "Unsorted-B-Cells"
+  #Longitudinal:
+    #- "no"
+    #- "Terminal-bleed"
+    #- "Vaccination-1"
+    #- "Vaccination-2"
+    #- "Vaccination-3"
+  #Age:
+    #- "no"
+    #- "77"
+    #- "81"
+ # Disease:
+    #- "no"
+    #- "HIV"
+    #- "CLL"
   Subject:
-    - "Subject-CLL-7"
-    - "Subject-CLL-1"
-    - "Subject-CLL-10"
-    - "Subject-CLL-9"
-    - "no"
-  Vaccine:
-    - "no"
-    - "HIV"
-  Chain:
-    - "Heavy"
-  Unique_sequences:
-    min: 5
-  Isotype:
-    - "Bulk"
-    - "IGHA"
-  Total_sequences:
-    min: 5
-  Size_MB:
-    max: 100000
+    - "Subject-326713"
+    #- "Subject-CLL-1"
+    #- "Subject-CLL-10"
+    #- "Subject-CLL-9"
+    #- "no"
+  #Vaccine:
+    #- "no"
+    #- "HIV"
+  #Chain:
+    #- "Heavy"
+  #Unique_sequences:
+    #min: 5
+  #Isotype:
+    #- "Bulk"
+    #- "IGHA"
+  #Total_sequences:
+    #min: 5
+  #Size_MB:
+    #max: 100000
 
 columns_to_keep:
   - "locus"

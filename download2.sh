@@ -24,7 +24,11 @@ echo "Columns to keep: $columns"
 count=1
 header_written=false # Track if header has been written
 
-while read -r url; do
+# Add a sequence counter variable
+seq_counter=1
+
+# Skip the header line and then read the rest of the file
+tail -n +2 "$input_file" | while IFS=',' read -r file_id url; do
   if (( count % nth_line == 0 )); then
     echo "Downloading: $url"
     # Download file into 'downloading' directory
@@ -60,12 +64,15 @@ while read -r url; do
           echo "Extracting columns: $columns"
           if [ "$header_written" = false ]; then
             echo "Writing header..."
-            # Write a header using the first file's column names
-            csvcut -c "$columns" "assets/header.csv" | head -n 1 > "$output_file"
+            # Add Sequence_ID to header
+            (echo "Sequence_ID,File_ID"; csvcut -c "$columns" "assets/header.csv" | head -n 1) | paste -sd ',' > "$output_file"
             header_written=true
           fi
-          # Append filtered data (no header)
-          csvcut -c "$columns" "$temp_file" >> "$output_file"
+          # Append filtered data with Sequence_ID and File_ID
+          while IFS= read -r line; do
+            echo "$seq_counter,$file_id,$line" >> "$output_file"
+            ((seq_counter++))
+          done < <(csvcut -c "$columns" "$temp_file")
         fi
         echo "Done processing $(basename "$file")."
         # Clean up temporary files
@@ -79,6 +86,6 @@ while read -r url; do
     rm -f "$download_dir"/*.gz
   fi
   ((count++))
-done < "$input_file"
+done
 
 echo "Data has been written to $output_file."
