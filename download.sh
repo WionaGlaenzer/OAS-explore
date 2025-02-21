@@ -31,62 +31,68 @@ seq_counter=1
 
 # Skip the header line and then read the rest of the file
 tail -n +2 "$input_file" | while IFS=',' read -r file_id url; do
-  if (( count % nth_line == 0 )); then
-    echo "Downloading: $url"
-    # Download file into 'downloading' directory
-    wget -P "$download_dir" "$url"
-    
-    # Unzip any .gz files
-    echo "Unzipping files..."
-    for file in "$download_dir"/*.gz; do
-      if [ -f "$file" ]; then
-        gunzip "$file"
-      fi
-    done
-    
-    # Process CSV files using csvkit
-    for file in "$download_dir"/*.csv; do
-      if [ -r "$file" ]; then
-        echo "Processing file: $(basename "$file")"
-        
-        # Create temporary file without the first two rows
-        temp_file_skip="${file}.skip2.csv"
-        tail -n +3 "$file" > "$temp_file_skip"
-        
-        # Save filtered results to a temporary file
-        temp_file="${file}.filtered.csv"
-        csvgrep -c 35 -r '.{20,}' "$temp_file_skip" | \
-        csvgrep -c 45 -r '.{10,}' | \
-        csvgrep -c 37 -r '^.{5,12}$' | \
-        csvgrep -c 41 -r '^.{1,10}$' | \
-        csvgrep -c 47 -r '^.{5,38}$' > "$temp_file"
-        
-        # If the filtered file is not empty, extract columns
-        if [ -s "$temp_file" ]; then
-          echo "Extracting columns: $columns"
-          if [ "$header_written" = false ]; then
-            echo "Writing header..."
-            # Add Sequence_ID to header
-            (echo "Sequence_ID,File_ID"; csvcut -c "$columns" "assets/header.csv" | head -n 1) | paste -sd ',' > "$output_file"
-            header_written=true
+  echo "Downloading: $url"
+  # Download file into 'downloading' directory
+  wget -P "$download_dir" "$url"
+  
+  # Unzip any .gz files
+  echo "Unzipping files..."
+  for file in "$download_dir"/*.gz; do
+    if [ -f "$file" ]; then
+      gunzip "$file"
+    fi
+  done
+  
+  # Process CSV files using csvkit
+  for file in "$download_dir"/*.csv; do
+    if [ -r "$file" ]; then
+      echo "Processing file: $(basename "$file")"
+      
+      # Create temporary file without the first two rows
+      temp_file_skip="${file}.skip2.csv"
+      tail -n +3 "$file" > "$temp_file_skip"
+      
+      # Process every nth line from the file
+      count_in_file=1  # Line counter within the current file
+      while IFS= read -r line; do
+        if (( count_in_file % nth_line == 0 )); then
+          # Save filtered results to a temporary file
+          temp_file="${file}.filtered.csv"
+          csvgrep -c 35 -r '.{20,}' "$temp_file_skip" | \
+          csvgrep -c 45 -r '.{10,}' | \
+          csvgrep -c 37 -r '^.{5,12}$' | \
+          csvgrep -c 41 -r '^.{1,10}$' | \
+          csvgrep -c 47 -r '^.{5,38}$' > "$temp_file"
+
+          # If the filtered file is not empty, extract columns
+          if [ -s "$temp_file" ]; then
+            echo "Extracting columns: $columns"
+            if [ "$header_written" = false ]; then
+              echo "Writing header..."
+              # Add Sequence_ID to header
+              (echo "Sequence_ID,File_ID"; csvcut -c "$columns" "assets/header.csv" | head -n 1) | paste -sd ',' > "$output_file"
+              header_written=true
+            fi
+            # Append filtered data with Sequence_ID and File_ID
+            while IFS= read -r line; do
+              echo "$seq_counter,$file_id,$line" >> "$output_file"
+              ((seq_counter++))
+            done < <(csvcut -c "$columns" "$temp_file")
           fi
-          # Append filtered data with Sequence_ID and File_ID
-          while IFS= read -r line; do
-            echo "$seq_counter,$file_id,$line" >> "$output_file"
-            ((seq_counter++))
-          done < <(csvcut -c "$columns" "$temp_file")
+          echo "Done processing $(basename "$file")."
+          # Clean up temporary files
+          rm -f "$temp_file_skip"
+          rm -f "$temp_file"
         fi
-        echo "Done processing $(basename "$file")."
-        # Clean up temporary files
-        rm -f "$temp_file_skip"
-        rm -f "$temp_file"
-      fi
-    done
-    
-    # Clean up downloaded files
-    rm -f "$download_dir"/*.csv
-    rm -f "$download_dir"/*.gz
-  fi
+        ((count_in_file++))
+      done < "$temp_file_skip"
+      
+      # Clean up downloaded files
+      rm -f "$download_dir"/*.csv
+      rm -f "$download_dir"/*.gz
+    fi
+  done
+
   ((count++))
 done
 

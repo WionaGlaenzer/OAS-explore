@@ -88,6 +88,7 @@ download_dir: "/REDACTED/PATH"
 output_dir: "/REDACTED/PATH"
 linclust_dir: "/REDACTED/PATH"
 
-n_lines: 100
+n_lines: 10000
+
 
 ###### Model settings #####
