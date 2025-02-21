@@ -88,6 +88,7 @@ download_dir: "/cluster/scratch/wglaenzer/data/pipeline_downloading2"
 output_dir: "/cluster/scratch/wglaenzer/data/pipeline_outputs_try2"
 linclust_dir: "/cluster/scratch/wglaenzer/data/pipeline_linclust2"
 
-n_lines: 100
+n_lines: 10000
+
 
 ###### Model settings #####
