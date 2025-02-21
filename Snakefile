@@ -24,7 +24,7 @@ rule download_data:
         data_list = "outputs/data_to_download.csv",
         header = "assets/header.csv"
     output:
-        "outputs/sequences2.csv"
+        "outputs/sequences.csv"
     params:
         columns_to_keep = config["columns_to_keep"]
     run:
@@ -35,11 +35,11 @@ rule download_data:
         # Join the column numbers with commas
         col_numbers = ",".join(col_positions)
         # Run the shell command
-        shell("bash download2.sh {input.data_list} {output} 1 {col_numbers}")
+        shell("bash download.sh {input.data_list} {output} 1 {col_numbers}")
 
 rule csv_to_fasta:
     input:
-        sequences_csv = "outputs/sequences2.csv",
+        sequences_csv = "outputs/sequences.csv",
     output:
         sequences_fasta = "outputs/sequences.fasta"
     run:
@@ -55,21 +55,21 @@ rule linclust:
 
 rule select_filtered_sequences_in_csv:
     input:
-        sequences_csv = "outputs/sequences2.csv",
+        sequences_csv = "outputs/sequences.csv",
         sequences_fasta = "linclust/antibody_DB_clu_rep.fasta"
     output:
         "outputs/sequences_filtered.csv"
     run:
         filter_representative_sequences(
         "linclust/antibody_DB_clu_rep.fasta",
-        "outputs/sequences2.csv",
+        "outputs/sequences.csv",
         "outputs/sequences_filtered.csv"
     )
 
 """
 rule sample_sequences:
     input:
-        "outputs/sequences2.csv"
+        "outputs/sequences.csv"
     output:
         "outputs/sampled_sequences.csv"
     run:

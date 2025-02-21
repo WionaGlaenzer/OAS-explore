@@ -1,3 +1,6 @@
 __pycache__/
 .snakemake/
 outputs/
+downloading/
+outputs/
+linclust/

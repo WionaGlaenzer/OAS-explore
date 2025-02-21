@@ -1,9 +1,8 @@
 #!/bin/bash
-
-# Ensure proper usage
+# Ensure correct usage
 if [ "$#" -ne 4 ]; then
-    echo "Usage: $0 <input_file> <output_file> <nth_line> <columns>"
-    exit 1
+  echo "Usage: $0 <input_file> <output_file> <nth_line> <columns>"
+  exit 1
 fi
 
 # Parameters
@@ -15,7 +14,6 @@ columns="$4"
 # Create and use a dedicated 'downloading' folder
 download_dir="downloading"
 mkdir -p "$download_dir"
-
 echo "Input file: $input_file"
 echo "Output file: $output_file"
 echo "Every n-th line: $nth_line"
@@ -23,59 +21,71 @@ echo "Columns to keep: $columns"
 
 # Clear the output file before writing new results
 > "$output_file"
-
 count=1
+header_written=false # Track if header has been written
 
-while read -r url; do 
-    if (( count % nth_line == 0 )); then
-        echo "Downloading: $url"
+# Add a sequence counter variable
+seq_counter=1
+
+# Skip the header line and then read the rest of the file
+tail -n +2 "$input_file" | while IFS=',' read -r file_id url; do
+  if (( count % nth_line == 0 )); then
+    echo "Downloading: $url"
+    # Download file into 'downloading' directory
+    wget -P "$download_dir" "$url"
+    
+    # Unzip any .gz files
+    echo "Unzipping files..."
+    for file in "$download_dir"/*.gz; do
+      if [ -f "$file" ]; then
+        gunzip "$file"
+      fi
+    done
+    
+    # Process CSV files using csvkit
+    for file in "$download_dir"/*.csv; do
+      if [ -r "$file" ]; then
+        echo "Processing file: $(basename "$file")"
         
-        # Download file into 'downloading' directory
-        wget -P "$download_dir" "$url"
-
-        # Unzip any .gz files
-        echo "Unzipping files..."
-        for file in "$download_dir"/*.gz; do
-            if [ -f "$file" ]; then
-                gunzip "$file"
-            fi
-        done
-
-        # Process CSV files
-        for file in "$download_dir"/*.csv; do
-            if [ -r "$file" ]; then
-                echo "Processing file: $(basename "$file")"
-                
-                awk -v cols="$columns" '
-                BEGIN {
-                    FS = ","  # Standard CSV delimiter
-                    OFS = ","  # Ensure output uses commas as well
-                    split(cols, colArr, ",")  # Convert user-specified columns into an array
-                }
-                function clean_field(field) {
-                    gsub(/^"|"$/, "", field)  # Remove leading/trailing quotes
-                    return field
-                }
-                NR > 2 && length($35) >= 20 && length($45) >= 10 && length($37) >= 5 && length($37) <= 12 && length($41) <= 10 && length($41) >= 1 && length($47) >= 5 && length($47) <= 38 {
-                    out = ""
-                    for (i in colArr) {
-                        field = clean_field($colArr[i])  # Clean up quotes
-                        if (out == "") {
-                            out = field  # First column (no leading comma)
-                        } else {
-                            out = out OFS field  # Append subsequent columns with commas
-                        }
-                    }
-                    print out
-                }' "$file" >> "$output_file"
-            fi
-        done
-
-        # Clean up downloaded files
-        rm -f "$download_dir"/*.csv
-        rm -f "$download_dir"/*.gz
-    fi
-    ((count++))
-done < "$input_file"
+        # Create temporary file without the first two rows
+        temp_file_skip="${file}.skip2.csv"
+        tail -n +3 "$file" > "$temp_file_skip"
+        
+        # Save filtered results to a temporary file
+        temp_file="${file}.filtered.csv"
+        csvgrep -c 35 -r '.{20,}' "$temp_file_skip" | \
+        csvgrep -c 45 -r '.{10,}' | \
+        csvgrep -c 37 -r '^.{5,12}$' | \
+        csvgrep -c 41 -r '^.{1,10}$' | \
+        csvgrep -c 47 -r '^.{5,38}$' > "$temp_file"
+        
+        # If the filtered file is not empty, extract columns
+        if [ -s "$temp_file" ]; then
+          echo "Extracting columns: $columns"
+          if [ "$header_written" = false ]; then
+            echo "Writing header..."
+            # Add Sequence_ID to header
+            (echo "Sequence_ID,File_ID"; csvcut -c "$columns" "assets/header.csv" | head -n 1) | paste -sd ',' > "$output_file"
+            header_written=true
+          fi
+          # Append filtered data with Sequence_ID and File_ID
+          while IFS= read -r line; do
+            echo "$seq_counter,$file_id,$line" >> "$output_file"
+            ((seq_counter++))
+          done < <(csvcut -c "$columns" "$temp_file")
+        fi
+        echo "Done processing $(basename "$file")."
+        # Clean up temporary files
+        rm -f "$temp_file_skip"
+        rm -f "$temp_file"
+      fi
+    done
+    
+    # Clean up downloaded files
+    rm -f "$download_dir"/*.csv
+    rm -f "$download_dir"/*.gz
+  fi
+  ((count++))
+done
 
 echo "Data has been written to $output_file."
