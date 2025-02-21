@@ -1,7 +1,7 @@
 import pandas as pd
 import sys
-
-def select_files(filters, input_file="assets/OAS_overview.csv", output_file="data_to_download.csv"):
+import os
+def select_files(filters, input_file="assets/OAS_overview.csv", output_file="outputs/data_to_download.csv"):
     """Filters the dataset based on the given criteria and writes download links to a file."""
     
     # Load dataset
@@ -26,7 +26,7 @@ def select_files(filters, input_file="assets/OAS_overview.csv", output_file="dat
         print("Warning: No matching records found!")
     
     # Write filtered download links to output file
-    with open(f"outputs/{output_file}", 'w') as f:
+    with open(output_file, 'w') as f:
         f.write("File_index,Download_Link\n")
         for _, row in df.iterrows():
             f.write(f"{row['File_index']},{row['Download_Link']}\n")
@@ -77,3 +77,107 @@ def filter_representative_sequences(fasta_file, input_csv, output_csv):
             seq_id = line.split(',')[0]  # Get the ID from first column
             if seq_id in representative_ids:
                 out_f.write(line)
+
+import pandas as pd
+import ast
+
+
+# Function to extract keys as a list, accounting for insertions
+def extract_keys_with_insertions(parsed_dict):
+    """
+    From the parsed ANARCI numbering dictionary, extract all keys (including insertions) as a sorted list.
+    """
+    if isinstance(parsed_dict, dict):  # Ensure the input is a dictionary
+        keys = []
+        for region in parsed_dict.values():
+            if isinstance(region, dict):
+                for key in region.keys():
+                    try:
+                        # Try to parse the base number (before any letter)
+                        base_number = int("".join(filter(str.isdigit, key.strip())))
+                        keys.append(base_number)
+                    except ValueError:
+                        continue  # Skip invalid keys if parsing fails
+        return sorted(keys)  # Sort keys for consistency
+    return None  # Return None for invalid inputs
+
+def clean_and_parse_dict(column_value):
+    """
+    Function to clean the anarci numbering string (as saved in OAS) and parse it into a dictionary.
+    """
+    if pd.notnull(column_value):  # Check for non-null values
+        try:
+            # Use ast.literal_eval to parse the string safely
+            parsed_dict = ast.literal_eval(column_value.strip())
+            return parsed_dict  # Return the parsed dictionary
+        except (SyntaxError, ValueError):
+            # If parsing fails, return None
+            return None
+    return None
+
+def process_anarci_column(csv_file, output_file):
+    """
+    Process the ANARCI column in the CSV file and save the result to a new file.
+    """
+    # Read the CSV file
+    df = pd.read_csv(csv_file)
+    # Clean and parse the ANARCI column
+    df["anarci_list"] = df["ANARCI_numbering"].apply(clean_and_parse_dict)
+    df["anarci_list"] = df["anarci_list"].apply(extract_keys_with_insertions)
+    # Remove the ANARCI column
+    df = df.drop(columns=["ANARCI_numbering"])
+    # Save the result to a new file
+    df.to_csv(output_file, index=False)
+
+def get_sequences_per_individual(oas_overview, sequences):
+    """
+    Get the number of sequences per individual from the OAS overview CSV file and the sequences CSV file.
+    """
+    # Read the OAS overview CSV file
+    oas_overview = pd.read_csv(oas_overview)
+    # Read the sequences CSV file
+    sequences = pd.read_csv(sequences)
+    # get all unique files from the sequences CSV file
+    indices = sequences["File_ID"]
+    oas_overview = oas_overview[oas_overview["File_index"].isin(indices)]
+    unique_individuals = oas_overview["Subject"].unique()
+    # make dictionary with subject name as key and the file_indexes as a list as value
+    files_per_individual = {individual: oas_overview[oas_overview["Subject"] == individual]["File_index"].unique().tolist() for individual in unique_individuals}
+    # count number of rows in sequences file with the file_indexes in the files_per_individual dictionary
+    for individual, files in files_per_individual.items():
+        for file in files:
+            count = sequences[sequences["File_ID"] == file].shape[0]
+            print(f"{individual}: {file} - {count}")
+    
+    print(files_per_individual)
+
+    return files_per_individual
+
+def separate_individuals(sequences, files_per_individual, output_folder):
+    os.makedirs(output_folder, exist_ok=True)
+    created_files = []  # List to store created file names
+    sequences = pd.read_csv(sequences)
+
+    for i in files_per_individual:
+
+        new_file = f"{output_folder}/individual_{i}.csv"
+        
+        # Check if file exists to control header writing
+        file_exists = os.path.isfile(new_file)
+
+
+        for file in files_per_individual[i]:
+            subset = sequences[sequences["File_ID"] == file]
+            
+            # Append mode ('a'), write header only if file does not exist
+            subset.to_csv(new_file, mode='a', index=False, header=not file_exists)
+
+            # Update file_exists to avoid writing header again in the next iterations
+            file_exists = True
+        
+        created_files.append(new_file)
+
+    created_files_path = f"{output_folder}/created_files.txt"
+    with open(created_files_path, "w") as f:
+        for file in created_files:
+            f.write(file + "\n")

@@ -11,7 +11,7 @@ filtering:
 filters:
   Species:
     - "rabbit"
-    - "human"
+    #- "human"
   #Author: # Use the publication name as it appears on OAS
     #- "Banerjee et al., 2017"
     #- "Bashford et al., 2013"
@@ -34,8 +34,8 @@ filters:
     #- "no"
     #- "HIV"
     #- "CLL"
-  Subject:
-    - "Subject-326713"
+  #Subject:
+    #- "Subject-326713"
     #- "Subject-CLL-1"
     #- "Subject-CLL-10"
     #- "Subject-CLL-9"
@@ -79,5 +79,15 @@ output:
 resources:
   threads: 4
   memory: "16GB"
+
+sampling_scheme: "random" # "random" or "balance_individuals"
+
+total_sequences: 1000
+
+download_dir: "/REDACTED/PATH"
+output_dir: "/REDACTED/PATH"
+linclust_dir: "/REDACTED/PATH"
+
+n_lines: 100
 
 ###### Model settings #####

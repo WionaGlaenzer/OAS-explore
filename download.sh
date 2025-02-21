@@ -1,7 +1,7 @@
 #!/bin/bash
 # Ensure correct usage
-if [ "$#" -ne 4 ]; then
-  echo "Usage: $0 <input_file> <output_file> <nth_line> <columns>"
+if [ "$#" -ne 5 ]; then
+  echo "Usage: $0 <input_file> <output_file> <nth_line> <columns> <download_dir>"
   exit 1
 fi
 
@@ -10,14 +10,16 @@ input_file="$1"
 output_file="$2"
 nth_line="$3"
 columns="$4"
+download_dir="$5"
 
 # Create and use a dedicated 'downloading' folder
-download_dir="downloading"
 mkdir -p "$download_dir"
 echo "Input file: $input_file"
 echo "Output file: $output_file"
 echo "Every n-th line: $nth_line"
 echo "Columns to keep: $columns"
+
+module load eth_proxy
 
 # Clear the output file before writing new results
 > "$output_file"
