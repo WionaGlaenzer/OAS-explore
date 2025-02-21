@@ -106,3 +106,21 @@ rule get_sequences_per_individual:
         files_per_individual = get_sequences_per_individual(input.oas_overview, input.sequences_csv)
         os.makedirs(output[0], exist_ok=True)
         separate_individuals(input.sequences_csv, files_per_individual, output[0])
+
+rule sample_by_individual:
+    input:
+        directory(f"{output_dir}/sequences_per_individual/")  # Input directory with the files
+    output:
+        directory(f"{output_dir}/sampled_sequences_by_individual/")  # Output directory
+    params:
+        n_samples = config["n_samples"],  # Number of samples to extract (from config)
+    run:
+        # Iterate over all files in the input directory
+        for file in input:
+            # Generate a new output file name based on the input file name
+            file_name = basename(file)  # Get the file name without the path
+            output_file = f"{output_dir}/sampled_sequences_by_individual/{file_name}"
+
+            # Call the shell script to process the file and save it to the output directory
+            shell(f"bash sample_sequences.sh {file} {output_file} {params.n_samples}")
+
