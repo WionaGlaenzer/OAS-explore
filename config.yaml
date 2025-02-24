@@ -52,8 +52,8 @@ filters:
     #- "IGHA"
   #Total_sequences:
     #min: 5
-  #Size_MB:
-    #max: 100000
+  Size_MB:
+    max: 100
 
 columns_to_keep:
   - "locus"
@@ -80,15 +80,16 @@ resources:
   threads: 4
   memory: "16GB"
 
-sampling_scheme: "random" # "random" or "balance_individuals"
+sampling_scheme: "balance_individuals" # "random" or "balance_individuals"
 
 total_sequences: 1000
 
-download_dir: "/REDACTED/PATHratch/REDACTED/PATHne_downloading2"
-output_dir: "/REDACTED/PATHratch/REDACTED/PATHne_outputs_try2"
-linclust_dir: "/REDACTED/PATHratch/REDACTED/PATHne_linclust2"
+download_dir: "/REDACTED/PATHratch/REDACTED/PATHne_downloading3"
+output_dir: "/REDACTED/PATHratch/REDACTED/PATHne_outputs_try3"
+linclust_dir: "/REDACTED/PATHratch/REDACTED/PATHne_linclust3"
 
-n_lines: 10000
+n_lines: 1
+n_samples: 1000
 
 
 ###### Model settings #####
