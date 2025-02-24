@@ -3,6 +3,8 @@ configfile: "config.yaml"
 import pandas as pd
 from data_functions import (select_files, csv_to_fasta, filter_representative_sequences, 
                           process_anarci_column, get_sequences_per_individual, separate_individuals)
+import glob
+import os
 
 output_dir = config["output_dir"]
 linclust_dir = config["linclust_dir"]
@@ -95,6 +97,18 @@ rule sample_sequences:
     run:
         if params.sampling_scheme == "random":
             shell("bash sample_sequences.sh {input} {output} {params.total_sequences}")
+            
+        elif params.sampling_scheme == "balance_individuals":
+            # Create output directory if it doesn't exist
+            shell(f"mkdir -p {output}")
+            no_sequences_per_individual = config["total_sequences"]/len(input)
+            # Iterate over all input files
+            for file in input:
+                file_name = os.path.basename(file)
+                output_file = f"{output}/{file_name}_sampled"
+            
+                # Call the shell script to process the file
+                shell(f"bash sample_sequences.sh {file} {output_file} {params.no_sequences_per_individual}")
 
 rule get_sequences_per_individual:
     input:
@@ -103,24 +117,29 @@ rule get_sequences_per_individual:
     output:
         directory(f"{output_dir}/sequences_per_individual/")
     run:
-        files_per_individual = get_sequences_per_individual(input.oas_overview, input.sequences_csv)
-        os.makedirs(output[0], exist_ok=True)
-        separate_individuals(input.sequences_csv, files_per_individual, output[0])
+        if params.sampling_scheme == "balance_individuals":
+            files_per_individual = get_sequences_per_individual(input.oas_overview, input.sequences_csv)
+            os.makedirs(output[0], exist_ok=True)
+            separate_individuals(input.sequences_csv, files_per_individual, output[0])
 
 rule sample_by_individual:
     input:
-        directory(f"{output_dir}/sequences_per_individual/")  # Input directory with the files
+        lambda wildcards: glob.glob(f"{output_dir}/sequences_per_individual/*.csv")  # Get all CSV files in directory
     output:
-        directory(f"{output_dir}/sampled_sequences_by_individual/")  # Output directory
+        directory(f"{output_dir}/sampled_sequences_by_individual/")
     params:
-        n_samples = config["n_samples"],  # Number of samples to extract (from config)
+        n_samples = config["n_samples"],
+        input_dir = f"{output_dir}/sequences_per_individual"  # Add input directory as parameter
     run:
-        # Iterate over all files in the input directory
-        for file in input:
-            # Generate a new output file name based on the input file name
-            file_name = basename(file)  # Get the file name without the path
-            output_file = f"{output_dir}/sampled_sequences_by_individual/{file_name}"
-
-            # Call the shell script to process the file and save it to the output directory
-            shell(f"bash sample_sequences.sh {file} {output_file} {params.n_samples}")
+        if params.sampling_scheme == "balance_individuals":
+            # Create output directory if it doesn't exist
+            shell(f"mkdir -p {output}")
+            no_sequences_per_individual = config["total_sequences"]/len(input)
+            # Iterate over all input files
+            for file in input:
+                file_name = os.path.basename(file)
+                output_file = f"{output}/{file_name}"
+            
+                # Call the shell script to process the file
+                shell(f"bash sample_sequences.sh {file} {output_file} {params.no_sequences_per_individual}")
 

@@ -52,8 +52,8 @@ filters:
     #- "IGHA"
   #Total_sequences:
     #min: 5
-  #Size_MB:
-    #max: 100000
+  Size_MB:
+    max: 100
 
 columns_to_keep:
   - "locus"
@@ -80,7 +80,7 @@ resources:
   threads: 4
   memory: "16GB"
 
-sampling_scheme: "random" # "random" or "balance_individuals"
+sampling_scheme: "balance_individuals" # "random" or "balance_individuals"
 
 total_sequences: 1000
 
@@ -88,7 +88,8 @@ download_dir: "/REDACTED/PATH"
 output_dir: "/REDACTED/PATH"
 linclust_dir: "/REDACTED/PATH"
 
-n_lines: 10000
+n_lines: 1
+n_samples: 1000
 
 
 ###### Model settings #####

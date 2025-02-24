@@ -48,9 +48,12 @@ tail -n +2 "$input_file" | while IFS=',' read -r file_id url; do
     if [ -r "$file" ]; then
       echo "Processing file: $(basename "$file")"
       
-      # Create temporary file without the first two rows
-      temp_file_skip="${file}.skip2.csv"
-      tail -n +3 "$file" > "$temp_file_skip"
+      # Save first two rows to a separate file
+      temp_file_header="${file}.header.csv"
+      head -n 2 "$file" > "$temp_file_header"
+      
+      # Remove first two rows from original file (in-place)
+      sed -i '1,2d' "$file"
       
       # Process every nth line from the file
       count_in_file=1  # Line counter within the current file
@@ -58,7 +61,7 @@ tail -n +2 "$input_file" | while IFS=',' read -r file_id url; do
         if (( count_in_file % nth_line == 0 )); then
           # Save filtered results to a temporary file
           temp_file="${file}.filtered.csv"
-          csvgrep -c 35 -r '.{20,}' "$temp_file_skip" | \
+          csvgrep -c 35 -r '.{20,}' "$file" | \
           csvgrep -c 45 -r '.{10,}' | \
           csvgrep -c 37 -r '^.{5,12}$' | \
           csvgrep -c 41 -r '^.{1,10}$' | \
@@ -81,11 +84,11 @@ tail -n +2 "$input_file" | while IFS=',' read -r file_id url; do
           fi
           echo "Done processing $(basename "$file")."
           # Clean up temporary files
-          rm -f "$temp_file_skip"
+          rm -f "$temp_file_header"
           rm -f "$temp_file"
         fi
         ((count_in_file++))
-      done < "$temp_file_skip"
+      done < "$file"
       
       # Clean up downloaded files
       rm -f "$download_dir"/*.csv
