@@ -84,12 +84,12 @@ tail -n +2 "$input_file" | while IFS=',' read -r file_id url; do
       fi
       echo "Done processing $(basename "$file")."
       # Clean up temporary files
-      # rm -f "$temp_file_header"
-      # rm -f "$temp_file"
+      rm -f "$temp_file_header"
+      rm -f "$temp_file"
       
       # Clean up downloaded files
-      # rm -f "$download_dir"/*.csv
-      # rm -f "$download_dir"/*.gz
+      rm -f "$download_dir"/*.csv
+      rm -f "$download_dir"/*.gz
     fi
   done
 

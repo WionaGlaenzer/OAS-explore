@@ -1,9 +1,13 @@
 import pandas as pd
 import sys
 import os
+import logging
+
 def select_files(filters, input_file="assets/OAS_overview.csv", output_file="outputs/data_to_download.csv"):
     """Filters the dataset based on the given criteria and writes download links to a file."""
     
+    logging.info(f"Applying filters: {filters}")
+
     # Load dataset
     df = pd.read_csv(input_file)
 
@@ -128,6 +132,17 @@ def process_anarci_column(csv_file, output_file):
     df = df.drop(columns=["ANARCI_numbering"])
     # Do filerting to remove sequences with empty columns
     df = df.dropna(subset=["fwr1_aa", "cdr1_aa", "fwr2_aa", "cdr2_aa", "fwr3_aa", "cdr3_aa", "fwr4_aa"])
+    # Define length ranges for each column
+    length_ranges = {
+        "fwr1_aa": (20, 200),
+        "cdr1_aa": (5, 12),
+        "cdr2_aa": (1, 10),
+        "cdr3_aa": (5, 38),
+        "fwr4_aa": (10, 200)
+    }
+    # Filter rows based on length of entries in each specified column
+    for column, (min_length, max_length) in length_ranges.items():
+        df = df[df[column].apply(lambda x: min_length <= len(x) <= max_length)]
     # Save the result to a new file
     df.to_csv(output_file, index=False)
 
@@ -169,6 +184,70 @@ def separate_individuals(sequences, files_per_individual, output_folder):
 
 
         for file in files_per_individual[i]:
+            subset = sequences[sequences["File_ID"] == file]
+            
+            # Append mode ('a'), write header only if file does not exist
+            subset.to_csv(new_file, mode='a', index=False, header=not file_exists)
+
+            # Update file_exists to avoid writing header again in the next iterations
+            file_exists = True
+        
+        created_files.append(new_file)
+
+    created_files_path = f"{output_folder}/created_files.txt"
+    with open(created_files_path, "w") as f:
+        for file in created_files:
+            f.write(file + "\n")
+
+def get_sequences_per_publication(oas_overview, sequences):
+    """
+    Get the number of sequences per individual from the OAS overview CSV file and the sequences CSV file.
+    """
+    # Read the OAS overview CSV file
+    oas_overview = pd.read_csv(oas_overview)
+    # Read the sequences CSV file
+    sequences = pd.read_csv(sequences)
+    # get all unique files from the sequences CSV file
+    indices = sequences["File_ID"]
+    oas_overview = oas_overview[oas_overview["File_index"].isin(indices)]
+    unique_publications = oas_overview["Author"].unique()
+    # make dictionary with subject name as key and the file_indexes as a list as value
+    files_per_publication = {publication: oas_overview[oas_overview["Author"] == publication]["File_index"].unique().tolist() for publication in unique_publications}
+    # count number of rows in sequences file with the file_indexes in the files_per_individual dictionary
+    no_seqs_per_publication = {}
+    for publication, files in files_per_publication.items():
+        sequences_for_that_publication = 0
+        for file in files:
+            count = sequences[sequences["File_ID"] == file].shape[0]
+            sequences_for_that_publication += count
+            #print(f"{publication}: {file} - {count}")
+        logging.info(f"Number of sequences from publication {publication}: {count}")
+        no_seqs_per_publication[publication] = sequences_for_that_publication
+    
+    #print(files_per_publication)
+
+    return files_per_publication, no_seqs_per_publication
+
+def separate_publications(sequences, files_per_publication, output_folder):
+    os.makedirs(output_folder, exist_ok=True)
+    created_files = []  # List to store created file names
+    sequences = pd.read_csv(sequences)
+
+    for i in files_per_publication:
+        #remove spaces and special characters from i
+        i_filename = i.replace(" ", "_")
+        i_filename = i_filename.replace(",", "")
+        i_filename = i_filename.replace(":", "")
+        i_filename = i_filename.replace(";", "")
+        i_filename = i_filename.replace(".", "")
+
+        new_file = f"{output_folder}/publication_{i_filename}.csv"
+        
+        # Check if file exists to control header writing
+        file_exists = os.path.isfile(new_file)
+
+
+        for file in files_per_publication[i]:
             subset = sequences[sequences["File_ID"] == file]
             
             # Append mode ('a'), write header only if file does not exist
