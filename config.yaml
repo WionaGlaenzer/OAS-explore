@@ -15,10 +15,11 @@ filters:
   Author: # Use the publication name as it appears on OAS
     #- "Banerjee et al., 2017"
     #- "Bashford et al., 2013"
+    - "Kim et al., 2020"
     #- "Doria-Rose et al., 2015"
-    - "Eliyahu et al., 2015"
+    #- "Eliyahu et al., 2015"
   BSource:
-    - "PBMC"
+    #- "PBMC"
     #- "Spleen"
   #BType:
     #- "Unsorted-B-Cells"
@@ -28,8 +29,8 @@ filters:
     #- "Vaccination-1"
     #- "Vaccination-2"
     #- "Vaccination-3"
-  Age:
-    - "no"
+  #Age:
+    #- "no"
     #- "77"
     #- "81"
  # Disease:
@@ -49,13 +50,14 @@ filters:
     #- "Heavy"
   #Unique_sequences:
     #min: 5
+    #max: 500
   #Isotype:
     #- "Bulk"
     #- "IGHA"
   #Total_sequences:
     #min: 5
-  Size_MB:
-    max: 100
+  #Size_MB:
+    #max: 100
 
 columns_to_keep:
   - "locus"
@@ -82,16 +84,17 @@ resources:
   threads: 4
   memory: "16GB"
 
-sampling_scheme: "balance_individuals" # "random" or "balance_individuals"
+# Available options: "random", "balance_publications", "balance_individuals"
+sampling_scheme: "balance_individuals"
 
-total_sequences: 10
+total_sequences: 1000000
 
 download_dir: "/REDACTED/PATH"
 output_dir: "/REDACTED/PATH"
 linclust_dir: "/REDACTED/PATH"
 
 n_lines: 1
-n_samples: 1000
+n_samples: 100000
 
 
 ###### Model settings #####

@@ -2,14 +2,25 @@ configfile: "config.yaml"
 
 import pandas as pd
 from data_functions import (select_files, csv_to_fasta, filter_representative_sequences, 
-                          process_anarci_column, get_sequences_per_individual, separate_individuals)
+                          process_anarci_column, get_sequences_per_individual, separate_individuals,
+                          get_sequences_per_publication, separate_publications)
 import glob
 import os
 import math
+import logging
 
 output_dir = config["output_dir"]
 linclust_dir = config["linclust_dir"]
 download_dir = config["download_dir"]
+
+os.makedirs(output_dir, exist_ok=True)
+
+# Configure logging
+logging.basicConfig(
+    filename=f"{output_dir}/pipeline.log",
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+)
 
 rule all:
     input:
@@ -89,7 +100,8 @@ rule process_anarci_column:
 rule sample_sequences:
     input:
         sequences_csv = f"{output_dir}/sequences_filtered_processed.csv",
-        sampled_sequences_by_individual = f"{output_dir}/sampled_sequences_by_individual/.done" if config["sampling_scheme"] == "balance_individuals" else None
+        sampled_sequences_by_individual = f"{output_dir}/sampled_sequences_by_individual/.done" if config["sampling_scheme"] == "balance_individuals" else [],
+        sampled_sequences_by_publication = f"{output_dir}/sampled_sequences_by_publication/.done" if config["sampling_scheme"] == "balance_publications" else []
     output:
         f"{output_dir}/sampled_sequences.csv"
     params:
@@ -102,6 +114,9 @@ rule sample_sequences:
             # Combine the individual samples into final output
             shell(f"head -n 1 $(ls {output_dir}/sampled_sequences_by_individual/*.csv | head -n 1) > {output}")
             shell(f"for f in {output_dir}/sampled_sequences_by_individual/*.csv; do tail -n +2 $f >> {output}; done")
+        elif params.sampling_scheme == "balance_publications":
+            shell(f"head -n 1 $(ls {output_dir}/sampled_sequences_by_publication/*.csv | head -n 1) > {output}")
+            shell(f"for f in {output_dir}/sampled_sequences_by_publication/*.csv; do tail -n +2 $f >> {output}; done")
 
 rule get_sequences_per_individual:
     input:
@@ -133,4 +148,48 @@ rule sample_by_individual:
             file_name = os.path.basename(file)
             output_file = f"{output.directory}/{file_name}"
             shell(f"bash sample_sequences.sh {file} {output_file} {seqs_per_individual}")
+
+rule get_sequences_per_publication:
+    input:
+        sequences_csv = f"{output_dir}/sequences_filtered_processed.csv",
+        oas_overview = "assets/OAS_overview.csv"
+    output:
+        directory = directory(f"{output_dir}/sequences_per_publication/"),
+        flag = touch(f"{output_dir}/sequences_per_publication/.done")
+    params:
+        total_sequences = config["total_sequences"]
+    run:
+        seqs_per_publication = get_sequences_per_publication(input.oas_overview, input.sequences_csv)
+        files_per_publication = seqs_per_publication[0]
+        sample_per_publication = math.ceil(params.total_sequences / len(files_per_publication))
+        enough_sequences = True
+        print(seqs_per_publication)
+        for publication, n in seqs_per_publication[1].items():
+            if n < sample_per_publication:
+                logging.warning(f"Publication {publication} has only {n} sequences, less than the desired {sample_per_publication}")
+                enough_sequences = False
+        if not enough_sequences:
+            logging.error("Not enough sequences to sample by publication")
+            raise ValueError("Not enough sequences to sample by publication")
+        os.makedirs(output.directory, exist_ok=True)
+        separate_publications(input.sequences_csv, files_per_publication, output.directory)
+
+rule sample_by_publication:
+    input:
+        flag = f"{output_dir}/sequences_per_publication/.done",
+        files = lambda wildcards: glob.glob(f"{output_dir}/sequences_per_publication/*.csv")
+    output:
+        directory = directory(f"{output_dir}/sampled_sequences_by_publication/"),
+        flag = touch(f"{output_dir}/sampled_sequences_by_publication/.done")
+    params:
+        total_sequences = config["total_sequences"]
+    run:
+        shell(f"mkdir -p {output.directory}")
+        n_publications = len(input.files)
+        seqs_per_publication = math.ceil(params.total_sequences / n_publications)
+        
+        for file in input.files:
+            file_name = os.path.basename(file)
+            output_file = f"{output.directory}/{file_name}"
+            shell(f"bash sample_sequences.sh {file} {output_file} {seqs_per_publication}")
 
