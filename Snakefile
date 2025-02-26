@@ -5,6 +5,7 @@ from data_functions import (select_files, csv_to_fasta, filter_representative_se
                           process_anarci_column, get_sequences_per_individual, separate_individuals)
 import glob
 import os
+import math
 
 output_dir = config["output_dir"]
 linclust_dir = config["linclust_dir"]
@@ -19,7 +20,6 @@ rule all:
         f"{output_dir}/sequences_filtered.csv",
         f"{output_dir}/sequences_filtered_processed.csv",
         f"{output_dir}/sampled_sequences.csv",
-        directory(f"{output_dir}/sequences_per_individual/")
 
 rule select_files_to_download:
     output:
@@ -88,7 +88,8 @@ rule process_anarci_column:
 
 rule sample_sequences:
     input:
-        f"{output_dir}/sequences_filtered_processed.csv"
+        sequences_csv = f"{output_dir}/sequences_filtered_processed.csv",
+        sampled_sequences_by_individual = f"{output_dir}/sampled_sequences_by_individual/.done" if config["sampling_scheme"] == "balance_individuals" else None
     output:
         f"{output_dir}/sampled_sequences.csv"
     params:
@@ -96,50 +97,40 @@ rule sample_sequences:
         total_sequences = config["total_sequences"]
     run:
         if params.sampling_scheme == "random":
-            shell("bash sample_sequences.sh {input} {output} {params.total_sequences}")
-            
+            shell("bash sample_sequences.sh {input.sequences_csv} {output} {params.total_sequences}")
         elif params.sampling_scheme == "balance_individuals":
-            # Create output directory if it doesn't exist
-            shell(f"mkdir -p {output}")
-            no_sequences_per_individual = config["total_sequences"]/len(input)
-            # Iterate over all input files
-            for file in input:
-                file_name = os.path.basename(file)
-                output_file = f"{output}/{file_name}_sampled"
-            
-                # Call the shell script to process the file
-                shell(f"bash sample_sequences.sh {file} {output_file} {params.no_sequences_per_individual}")
+            # Combine the individual samples into final output
+            shell(f"head -n 1 $(ls {output_dir}/sampled_sequences_by_individual/*.csv | head -n 1) > {output}")
+            shell(f"for f in {output_dir}/sampled_sequences_by_individual/*.csv; do tail -n +2 $f >> {output}; done")
 
 rule get_sequences_per_individual:
     input:
         sequences_csv = f"{output_dir}/sequences_filtered_processed.csv",
         oas_overview = "assets/OAS_overview.csv"
     output:
-        directory(f"{output_dir}/sequences_per_individual/")
+        directory = directory(f"{output_dir}/sequences_per_individual/"),
+        flag = touch(f"{output_dir}/sequences_per_individual/.done")
     run:
-        if params.sampling_scheme == "balance_individuals":
-            files_per_individual = get_sequences_per_individual(input.oas_overview, input.sequences_csv)
-            os.makedirs(output[0], exist_ok=True)
-            separate_individuals(input.sequences_csv, files_per_individual, output[0])
+        files_per_individual = get_sequences_per_individual(input.oas_overview, input.sequences_csv)
+        os.makedirs(output.directory, exist_ok=True)
+        separate_individuals(input.sequences_csv, files_per_individual, output.directory)
 
 rule sample_by_individual:
     input:
-        lambda wildcards: glob.glob(f"{output_dir}/sequences_per_individual/*.csv")  # Get all CSV files in directory
+        flag = f"{output_dir}/sequences_per_individual/.done",
+        files = lambda wildcards: glob.glob(f"{output_dir}/sequences_per_individual/*.csv")
     output:
-        directory(f"{output_dir}/sampled_sequences_by_individual/")
+        directory = directory(f"{output_dir}/sampled_sequences_by_individual/"),
+        flag = touch(f"{output_dir}/sampled_sequences_by_individual/.done")
     params:
-        n_samples = config["n_samples"],
-        input_dir = f"{output_dir}/sequences_per_individual"  # Add input directory as parameter
+        total_sequences = config["total_sequences"]
     run:
-        if params.sampling_scheme == "balance_individuals":
-            # Create output directory if it doesn't exist
-            shell(f"mkdir -p {output}")
-            no_sequences_per_individual = config["total_sequences"]/len(input)
-            # Iterate over all input files
-            for file in input:
-                file_name = os.path.basename(file)
-                output_file = f"{output}/{file_name}"
-            
-                # Call the shell script to process the file
-                shell(f"bash sample_sequences.sh {file} {output_file} {params.no_sequences_per_individual}")
+        shell(f"mkdir -p {output.directory}")
+        n_individuals = len(input.files)
+        seqs_per_individual = math.ceil(params.total_sequences / n_individuals)
+        
+        for file in input.files:
+            file_name = os.path.basename(file)
+            output_file = f"{output.directory}/{file_name}"
+            shell(f"bash sample_sequences.sh {file} {output_file} {seqs_per_individual}")
 
