@@ -126,6 +126,8 @@ def process_anarci_column(csv_file, output_file):
     df["anarci_list"] = df["anarci_list"].apply(extract_keys_with_insertions)
     # Remove the ANARCI column
     df = df.drop(columns=["ANARCI_numbering"])
+    # Do filerting to remove sequences with empty columns
+    df = df.dropna(subset=["fwr1_aa", "cdr1_aa", "fwr2_aa", "cdr2_aa", "fwr3_aa", "cdr3_aa", "fwr4_aa"])
     # Save the result to a new file
     df.to_csv(output_file, index=False)
 

@@ -55,44 +55,41 @@ tail -n +2 "$input_file" | while IFS=',' read -r file_id url; do
       # Remove first two rows from original file (in-place)
       sed -i '1,2d' "$file"
       
-      # Process every nth line from the file
-      count_in_file=1  # Line counter within the current file
-      while IFS= read -r line; do
-        if (( count_in_file % nth_line == 0 )); then
-          # Save filtered results to a temporary file
-          temp_file="${file}.filtered.csv"
-          csvgrep -c 35 -r '.{20,}' "$file" | \
-          csvgrep -c 45 -r '.{10,}' | \
-          csvgrep -c 37 -r '^.{5,12}$' | \
-          csvgrep -c 41 -r '^.{1,10}$' | \
-          csvgrep -c 47 -r '^.{5,38}$' > "$temp_file"
+      # Filter the file once and process in memory
+      temp_file="${file}.filtered.csv"
+      csvgrep -c 35 -r '^(?!\s*$).{20,50}$' "$file" | \
+      csvgrep -c 45 -r '^(?!\s*$).{10,50}$' | \
+      csvgrep -c 37 -r '^(?!\s*$).{5,12}$' | \
+      csvgrep -c 41 -r '^(?!\s*$).{1,10}$' | \
+      csvgrep -c 47 -r '^(?!\s*$).{5,38}$' > "$temp_file"
 
-          # If the filtered file is not empty, extract columns
-          if [ -s "$temp_file" ]; then
-            echo "Extracting columns: $columns"
-            if [ "$header_written" = false ]; then
-              echo "Writing header..."
-              # Add Sequence_ID to header
-              (echo "Sequence_ID,File_ID"; csvcut -c "$columns" "assets/header.csv" | head -n 1) | paste -sd ',' > "$output_file"
-              header_written=true
-            fi
-            # Append filtered data with Sequence_ID and File_ID
-            while IFS= read -r line; do
-              echo "$seq_counter,$file_id,$line" >> "$output_file"
-              ((seq_counter++))
-            done < <(csvcut -c "$columns" "$temp_file")
-          fi
-          echo "Done processing $(basename "$file")."
-          # Clean up temporary files
-          rm -f "$temp_file_header"
-          rm -f "$temp_file"
+      # If the filtered file is not empty, process it
+      if [ -s "$temp_file" ]; then
+        echo "Extracting columns: $columns"
+        if [ "$header_written" = false ]; then
+          echo "Writing header..."
+          # Add Sequence_ID to header
+          (echo "Sequence_ID,File_ID"; csvcut -c "$columns" "assets/header.csv" | head -n 1) | paste -sd ',' > "$output_file"
+          header_written=true
         fi
-        ((count_in_file++))
-      done < "$file"
+
+        # Process every nth line from the filtered file
+        awk -v n="$nth_line" -v seq="$seq_counter" -v fid="$file_id" 'NR % n == 0 {
+          print seq "," fid "," $0;
+          seq++
+        }' <(csvcut -c "$columns" "$temp_file") >> "$output_file"
+
+        # Update seq_counter
+        seq_counter=$(( seq_counter + $(wc -l < "$temp_file") / nth_line ))
+      fi
+      echo "Done processing $(basename "$file")."
+      # Clean up temporary files
+      # rm -f "$temp_file_header"
+      # rm -f "$temp_file"
       
       # Clean up downloaded files
-      rm -f "$download_dir"/*.csv
-      rm -f "$download_dir"/*.gz
+      # rm -f "$download_dir"/*.csv
+      # rm -f "$download_dir"/*.gz
     fi
   done
 

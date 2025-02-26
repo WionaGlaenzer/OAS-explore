@@ -10,13 +10,15 @@ filtering:
 # Data filtering before download
 filters:
   Species:
-    - "rabbit"
-    #- "human"
-  #Author: # Use the publication name as it appears on OAS
+    #- "rabbit"
+    - "human"
+  Author: # Use the publication name as it appears on OAS
     #- "Banerjee et al., 2017"
     #- "Bashford et al., 2013"
-  #BSource:
-    #- "PBMC"
+    #- "Doria-Rose et al., 2015"
+    - "Eliyahu et al., 2015"
+  BSource:
+    - "PBMC"
     #- "Spleen"
   #BType:
     #- "Unsorted-B-Cells"
@@ -26,8 +28,8 @@ filters:
     #- "Vaccination-1"
     #- "Vaccination-2"
     #- "Vaccination-3"
-  #Age:
-    #- "no"
+  Age:
+    - "no"
     #- "77"
     #- "81"
  # Disease:
@@ -82,7 +84,7 @@ resources:
 
 sampling_scheme: "balance_individuals" # "random" or "balance_individuals"
 
-total_sequences: 1000
+total_sequences: 10
 
 download_dir: "/REDACTED/PATH"
 output_dir: "/REDACTED/PATH"
