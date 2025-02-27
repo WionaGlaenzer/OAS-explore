@@ -1,6 +1,7 @@
 import pandas as pd
 import sys
 import os
+from os.path import basename
 import logging
 
 def select_files(filters, input_file="assets/OAS_overview.csv", output_file="outputs/data_to_download.csv"):
@@ -13,7 +14,6 @@ def select_files(filters, input_file="assets/OAS_overview.csv", output_file="out
 
     # Print filters for debugging
     print(f"Applying filters: {filters}")
-    print(df["Disease"].unique())
     # Apply categorical filters
     for key, values in filters.items():
         if isinstance(values, list):  # If the filter is a list (e.g., species, isotype)
@@ -262,3 +262,21 @@ def separate_publications(sequences, files_per_publication, output_folder):
     with open(created_files_path, "w") as f:
         for file in created_files:
             f.write(file + "\n")
+
+def number_of_seqs_overview(input_files, output_file):
+    filenames = []
+    sequence_numbers = []
+    # iterate through the files and save the number of sequences in each
+    for file in input_files:
+        df = pd.read_csv(file)
+        no_of_seqs = len(df)
+        filenames.append(basename(file))
+        sequence_numbers.append(no_of_seqs)
+    # create a dataframe containing filenames and number of sequences
+    df_overview = pd.DataFrame({
+        "Filename": filenames,
+        "Number_of_sequences": sequence_numbers
+    })
+    # sort dataframe in descending order by Number_of_sequences
+    df_overview = df_overview.sort_values(by="Number_of_sequences", ascending=False)
+    df_overview.to_csv(output_file, index=False)
