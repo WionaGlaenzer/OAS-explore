@@ -3,7 +3,7 @@ configfile: "config.yaml"
 import pandas as pd
 from data_functions import (select_files, csv_to_fasta, filter_representative_sequences, 
                           process_anarci_column, get_sequences_per_individual, separate_individuals,
-                          get_sequences_per_publication, separate_publications)
+                          get_sequences_per_publication, separate_publications, number_of_seqs_overview)
 import glob
 import os
 import math
@@ -30,7 +30,8 @@ rule all:
         f"{linclust_dir}/antibody_DB_clu_rep.fasta",
         f"{output_dir}/sequences_filtered.csv",
         f"{output_dir}/sequences_filtered_processed.csv",
-        f"{output_dir}/sampled_sequences.csv",
+        #f"{output_dir}/sampled_sequences.csv",
+        f"{output_dir}/number_of_seqs_per_individual.csv"
 
 rule select_files_to_download:
     output:
@@ -193,3 +194,12 @@ rule sample_by_publication:
             output_file = f"{output.directory}/{file_name}"
             shell(f"bash sample_sequences.sh {file} {output_file} {seqs_per_publication}")
 
+rule number_of_seqs_overview:
+    input:
+        flag = f"{output_dir}/sequences_per_individual/.done",
+        files = lambda wildcards: glob.glob(f"{output_dir}/sequences_per_individual/*.csv")
+    output:
+        f"{output_dir}/number_of_seqs_per_individual.csv"
+    run:
+        number_of_seqs_overview(input.files, output[0])
+    
