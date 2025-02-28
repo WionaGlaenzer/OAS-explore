@@ -57,11 +57,11 @@ tail -n +2 "$input_file" | while IFS=',' read -r file_id url; do
       
       # Filter the file once and process in memory
       temp_file="${file}.filtered.csv"
-      csvgrep -c 35 -r '^(?!\s*$).{20,50}$' "$file" | \
-      csvgrep -c 45 -r '^(?!\s*$).{10,50}$' | \
-      csvgrep -c 37 -r '^(?!\s*$).{5,12}$' | \
-      csvgrep -c 41 -r '^(?!\s*$).{1,10}$' | \
-      csvgrep -c 47 -r '^(?!\s*$).{5,38}$' > "$temp_file"
+      csvgrep -c 35 -r '^(?!\s*$).{20,50}$' -u 0 "$file" | \
+      csvgrep -c 45 -r '^(?!\s*$).{10,50}$' -u 0 | \
+      csvgrep -c 37 -r '^(?!\s*$).{5,12}$' -u 0 | \
+      csvgrep -c 41 -r '^(?!\s*$).{1,10}$' -u 0 | \
+      csvgrep -c 47 -r '^(?!\s*$).{5,38}$' -u 0 > "$temp_file"
 
       # If the filtered file is not empty, process it
       if [ -s "$temp_file" ]; then
@@ -74,7 +74,7 @@ tail -n +2 "$input_file" | while IFS=',' read -r file_id url; do
         fi
 
         # Process every nth line from the filtered file
-        awk -v n="$nth_line" -v seq="$seq_counter" -v fid="$file_id" 'NR % n == 0 {
+        awk -v n="$nth_line" -v seq="$seq_counter" -v fid="$file_id" 'NR > 1 && NR % n == 0 {
           print seq "," fid "," $0;
           seq++
         }' <(csvcut -c "$columns" "$temp_file") >> "$output_file"
@@ -85,10 +85,10 @@ tail -n +2 "$input_file" | while IFS=',' read -r file_id url; do
       echo "Done processing $(basename "$file")."
       # Clean up temporary files
       rm -f "$temp_file_header"
-      rm -f "$temp_file"
+      #rm -f "$temp_file"
       
       # Clean up downloaded files
-      rm -f "$download_dir"/*.csv
+      #rm -f "$download_dir"/*.csv
       rm -f "$download_dir"/*.gz
     fi
   done

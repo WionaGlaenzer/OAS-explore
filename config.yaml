@@ -15,10 +15,12 @@ filters:
   Author: # Use the publication name as it appears on OAS
     #- "Banerjee et al., 2017"
     #- "Bashford et al., 2013"
-    - "Kim et al., 2020"
+    #- "Kim et al., 2020"
+    #- "Briney et al., 2019"
+    - "Soto et al., 2019"
     #- "Doria-Rose et al., 2015"
     #- "Eliyahu et al., 2015"
-  BSource:
+  #BSource:
     #- "PBMC"
     #- "Spleen"
   #BType:
@@ -89,9 +91,9 @@ sampling_scheme: "balance_individuals"
 
 total_sequences: 1000000
 
-download_dir: "/cluster/scratch/wglaenzer/data/pipeline_downloading_kim2020"
-output_dir: "/cluster/scratch/wglaenzer/data/pipeline_outputs_kim2020"
-linclust_dir: "/cluster/scratch/wglaenzer/data/pipeline_linclust_kim2020"
+download_dir: "/cluster/scratch/wglaenzer/data/pipeline_downloading_soto2019"
+output_dir: "/cluster/scratch/wglaenzer/data/pipeline_outputs_soto2019"
+linclust_dir: "/cluster/scratch/wglaenzer/data/pipeline_linclust_soto2019"
 
 n_lines: 1
 n_samples: 100000
