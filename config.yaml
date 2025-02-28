@@ -15,10 +15,12 @@ filters:
   Author: # Use the publication name as it appears on OAS
     #- "Banerjee et al., 2017"
     #- "Bashford et al., 2013"
-    - "Kim et al., 2020"
+    #- "Kim et al., 2020"
+    #- "Briney et al., 2019"
+    - "Soto et al., 2019"
     #- "Doria-Rose et al., 2015"
     #- "Eliyahu et al., 2015"
-  BSource:
+  #BSource:
     #- "PBMC"
     #- "Spleen"
   #BType:
