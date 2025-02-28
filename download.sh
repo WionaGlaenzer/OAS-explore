@@ -48,10 +48,6 @@ tail -n +2 "$input_file" | while IFS=',' read -r file_id url; do
     if [ -r "$file" ]; then
       echo "Processing file: $(basename "$file")"
       
-      # Save first two rows to a separate file
-      temp_file_header="${file}.header.csv"
-      head -n 2 "$file" > "$temp_file_header"
-      
       # Remove first two rows from original file (in-place)
       sed -i '1,2d' "$file"
       
@@ -84,11 +80,10 @@ tail -n +2 "$input_file" | while IFS=',' read -r file_id url; do
       fi
       echo "Done processing $(basename "$file")."
       # Clean up temporary files
-      rm -f "$temp_file_header"
-      #rm -f "$temp_file"
+      rm -f "$temp_file"
       
       # Clean up downloaded files
-      #rm -f "$download_dir"/*.csv
+      rm -f "$download_dir"/*.csv
       rm -f "$download_dir"/*.gz
     fi
   done
