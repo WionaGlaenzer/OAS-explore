@@ -65,7 +65,7 @@ filters:
   #Total_sequences:
     #min: 5
   Size_MB:
-    max: 100
+    max: 10
 
 columns_to_keep:
   - "locus"
@@ -95,7 +95,7 @@ resources:
 # Available options: "random", "balance_publications", "balance_individuals"
 sampling_scheme: "balance_publications"
 
-total_sequences: 1000
+total_sequences: 10
 
 download_dir: "/REDACTED/PATH"
 output_dir: "/REDACTED/PATH"

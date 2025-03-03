@@ -36,6 +36,7 @@ rule all:
         f"{output_dir}/test_set.csv",
         f"{output_dir}/training_set.csv",
         f"{output_dir}/training.txt",
+        f"{output_dir}/download_progress.txt",
 
 rule select_files_to_download:
     """
@@ -49,16 +50,20 @@ rule select_files_to_download:
     run:
         select_files(filters = params.filters, output_file = output[0])
 
-rule download_data:
+
+
+rule download_data2:
     """
     Downloads the files listed in data_to_download.csv successively,
     extracts sequences fulfilling length filtering criteria, and writes them to sequences.csv.
+    Tracks progress for easy restart.
     """
     input:
         data_list = f"{output_dir}/data_to_download.csv",
         header = "assets/header.csv"
     output:
-        f"{output_dir}/sequences.csv"
+        sequences = f"{output_dir}/sequences.csv",
+        progress = f"{output_dir}/download_progress.txt"
     params:
         columns_to_keep = config["columns_to_keep"],
         download_dir = config["download_dir"],
@@ -70,18 +75,9 @@ rule download_data:
         col_positions = [str(header_df.columns.get_loc(col) + 1) for col in params.columns_to_keep]
         # Join the column numbers with commas
         col_numbers = ",".join(col_positions)
-        # Run the shell command to download and process the data
-        shell("bash download.sh {input.data_list} {output} {params.n_lines} {col_numbers} {params.download_dir}")
-        #shell("""
-        # Check if the output file contains more than just the header
-        #line_count=$(cat {output} | wc -l)
-        # If there are no data lines (less than or equal to 1 line), raise an error and stop the pipeline
-        #if [ "$line_count" -le 1 ]; then
-        #    echo "Error: Output file {output} contains only the header and no data. Stopping the pipeline."
-        #    exit 1
-        #fi
-        #""")
-
+        
+        # Run the shell command to download and process the data with progress tracking
+        shell("bash download_with_tracking.sh {input.data_list} {output.sequences} {params.n_lines} {col_numbers} {params.download_dir} {output.progress}")
 
 rule csv_to_fasta:
     """
