@@ -1,11 +1,17 @@
 ###### Data selection #####
 # Filtering criteria
 filtering:
-  similarity_threshold: 0.9   # Remove sequences above 90% similarity
   max_sequences: 100000       # Limit dataset to 100,000 sequences
   min_length: 50              # Minimum sequence length
   max_length: 1000            # Maximum sequence length
   filter_by_region_length: true  # Filter sequences by region length
+
+linclust:
+  coverage: 0.9
+  similarity: 0.9 # Remove sequences above 90% similarity
+
+training_fraction: 0.8
+validation_fraction: 0.1
 
 # Data filtering before download
 filters:
@@ -17,8 +23,8 @@ filters:
     #- "Bashford et al., 2013"
     #- "Kim et al., 2020"
     #- "Briney et al., 2019"
-    - "Soto et al., 2019"
-    #- "Doria-Rose et al., 2015"
+    #- "Soto et al., 2019"
+    - "Doria-Rose et al., 2015"
     #- "Eliyahu et al., 2015"
   #BSource:
     #- "PBMC"
@@ -58,8 +64,8 @@ filters:
     #- "IGHA"
   #Total_sequences:
     #min: 5
-  #Size_MB:
-    #max: 100
+  Size_MB:
+    max: 100
 
 columns_to_keep:
   - "locus"
@@ -87,13 +93,13 @@ resources:
   memory: "16GB"
 
 # Available options: "random", "balance_publications", "balance_individuals"
-sampling_scheme: "balance_individuals"
+sampling_scheme: "balance_publications"
 
-total_sequences: 1000000
+total_sequences: 1000
 
-download_dir: "/REDACTED/PATHratch/REDACTED/PATHne_downloading_soto2019"
-output_dir: "/REDACTED/PATHratch/REDACTED/PATHne_outputs_soto2019"
-linclust_dir: "/REDACTED/PATHratch/REDACTED/PATHne_linclust_soto2019"
+download_dir: "/REDACTED/PATHratch/REDACTED/PATHne_downloading_test1"
+output_dir: "/REDACTED/PATHratch/REDACTED/PATHne_outputs_test1"
+linclust_dir: "/REDACTED/PATHratch/REDACTED/PATHne_linclust_test1"
 
 n_lines: 1
 n_samples: 100000
