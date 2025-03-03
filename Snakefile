@@ -3,7 +3,8 @@ configfile: "config.yaml"
 import pandas as pd
 from data_functions import (select_files, csv_to_fasta, filter_representative_sequences, 
                           process_anarci_column, get_sequences_per_individual, separate_individuals,
-                          get_sequences_per_publication, separate_publications, number_of_seqs_overview)
+                          get_sequences_per_publication, separate_publications, number_of_seqs_overview,
+                          csv_to_txt)
 import glob
 import os
 import math
@@ -24,16 +25,23 @@ logging.basicConfig(
 
 rule all:
     input:
-        #f"{output_dir}/sequences.csv",
-        #f"{output_dir}/data_to_download.csv",
-        #f"{output_dir}/sequences.fasta",
+        f"{output_dir}/sequences.csv",
+        f"{output_dir}/data_to_download.csv",
+        f"{output_dir}/sequences.fasta",
         f"{linclust_dir}/antibody_DB_clu_rep.fasta",
         f"{output_dir}/sequences_filtered.csv",
         f"{output_dir}/sequences_filtered_processed.csv",
-        #f"{output_dir}/sampled_sequences.csv",
-        f"{output_dir}/number_of_seqs_per_individual.csv"
+        f"{output_dir}/sampled_sequences.csv",
+        f"{output_dir}/number_of_seqs_per_individual.csv",
+        f"{output_dir}/test_set.csv",
+        f"{output_dir}/training_set.csv",
+        f"{output_dir}/training.txt",
 
 rule select_files_to_download:
+    """
+    Selects which files to download from OAS based on filters from the config file.
+    The links to these files are then listed in data_to_download.csv.
+    """
     output:
         f"{output_dir}/data_to_download.csv"
     params:
@@ -42,6 +50,10 @@ rule select_files_to_download:
         select_files(filters = params.filters, output_file = output[0])
 
 rule download_data:
+    """
+    Downloads the files listed in data_to_download.csv successively,
+    extracts sequences fulfilling length filtering criteria, and writes them to sequences.csv.
+    """
     input:
         data_list = f"{output_dir}/data_to_download.csv",
         header = "assets/header.csv"
@@ -58,10 +70,23 @@ rule download_data:
         col_positions = [str(header_df.columns.get_loc(col) + 1) for col in params.columns_to_keep]
         # Join the column numbers with commas
         col_numbers = ",".join(col_positions)
-        # Run the shell command
+        # Run the shell command to download and process the data
         shell("bash download.sh {input.data_list} {output} {params.n_lines} {col_numbers} {params.download_dir}")
+        #shell("""
+        # Check if the output file contains more than just the header
+        #line_count=$(cat {output} | wc -l)
+        # If there are no data lines (less than or equal to 1 line), raise an error and stop the pipeline
+        #if [ "$line_count" -le 1 ]; then
+        #    echo "Error: Output file {output} contains only the header and no data. Stopping the pipeline."
+        #    exit 1
+        #fi
+        #""")
+
 
 rule csv_to_fasta:
+    """
+    Converts the sequences.csv file to a FASTA file, which is used as the input for linclust.
+    """
     input:
         sequences_csv = f"{output_dir}/sequences.csv",
     output:
@@ -70,14 +95,25 @@ rule csv_to_fasta:
         csv_to_fasta(input.sequences_csv, output.sequences_fasta)
 
 rule linclust:
+    """
+    Runs linclust on the sequences.fasta file to cluster the sequences 
+    and select a representative sequence for each cluster. 
+    The coverage and similarity thresholds are set in the config file.
+    """
     input:
         sequences_fasta = f"{output_dir}/sequences.fasta"
     output:
         sequences_fasta = f"{linclust_dir}/antibody_DB_clu_rep.fasta"
+    params:
+        similarity = config["linclust"]["similarity"],
+        coverage = config["linclust"]["coverage"]
     run:
-        shell("bash linclust.sh {linclust_dir} {input.sequences_fasta}")
+        shell("bash linclust.sh {linclust_dir} {input.sequences_fasta} {params.similarity} {params.coverage}")
 
 rule select_filtered_sequences_in_csv:
+    """
+    Filters the sequences in the sequences.csv file to only include the representative sequences selected by linclust.
+    """
     input:
         sequences_fasta = f"{linclust_dir}/antibody_DB_clu_rep.fasta",
         sequences_csv = f"{output_dir}/sequences.csv"
@@ -91,6 +127,10 @@ rule select_filtered_sequences_in_csv:
         )
 
 rule process_anarci_column:
+    """
+    Processes the ANARCI column in the sequences_filtered.csv file to turn them into a list, 
+    also completes a second round of length filtering.
+    """
     input:
         sequences_csv = f"{output_dir}/sequences_filtered.csv"
     output:
@@ -99,6 +139,10 @@ rule process_anarci_column:
         process_anarci_column(input.sequences_csv, output.filename)
 
 rule sample_sequences:
+    """
+    Samples sequences from the sequences_filtered_processed.csv file
+    based on the sampling scheme specified in the config file.
+    """
     input:
         sequences_csv = f"{output_dir}/sequences_filtered_processed.csv",
         sampled_sequences_by_individual = f"{output_dir}/sampled_sequences_by_individual/.done" if config["sampling_scheme"] == "balance_individuals" else [],
@@ -120,6 +164,10 @@ rule sample_sequences:
             shell(f"for f in {output_dir}/sampled_sequences_by_publication/*.csv; do tail -n +2 $f >> {output}; done")
 
 rule get_sequences_per_individual:
+    """
+    Separates the sequences in the sequences_filtered_processed.csv file into separate files for each individual
+    based on the OAS overview file to use for sampling balanced by individuals.
+    """
     input:
         sequences_csv = f"{output_dir}/sequences_filtered_processed.csv",
         oas_overview = "assets/OAS_overview.csv"
@@ -132,6 +180,9 @@ rule get_sequences_per_individual:
         separate_individuals(input.sequences_csv, files_per_individual, output.directory)
 
 rule sample_by_individual:
+    """
+    Samples the same number of sequences from each individual to reach a total number of sequences specified in the config file.
+    """
     input:
         flag = f"{output_dir}/sequences_per_individual/.done",
         files = lambda wildcards: glob.glob(f"{output_dir}/sequences_per_individual/*.csv")
@@ -151,6 +202,10 @@ rule sample_by_individual:
             shell(f"bash sample_sequences.sh {file} {output_file} {seqs_per_individual}")
 
 rule get_sequences_per_publication:
+    """
+    Separates the sequences in the sequences_filtered_processed.csv file into separate files for each publication
+    based on the OAS overview file to use for sampling balanced by publications.
+    """
     input:
         sequences_csv = f"{output_dir}/sequences_filtered_processed.csv",
         oas_overview = "assets/OAS_overview.csv"
@@ -176,6 +231,9 @@ rule get_sequences_per_publication:
         separate_publications(input.sequences_csv, files_per_publication, output.directory)
 
 rule sample_by_publication:
+    """
+    Samples the same number of sequences from each publication to reach a total number of sequences specified in the config file.
+    """
     input:
         flag = f"{output_dir}/sequences_per_publication/.done",
         files = lambda wildcards: glob.glob(f"{output_dir}/sequences_per_publication/*.csv")
@@ -195,6 +253,10 @@ rule sample_by_publication:
             shell(f"bash sample_sequences.sh {file} {output_file} {seqs_per_publication}")
 
 rule number_of_seqs_overview:
+    """
+    Creates an overview of the number of sequences per individual based on the sampled sequences.
+    This can be used to choose a reasonable number of sequences to sample.
+    """
     input:
         flag = f"{output_dir}/sequences_per_individual/.done",
         files = lambda wildcards: glob.glob(f"{output_dir}/sequences_per_individual/*.csv")
@@ -202,4 +264,46 @@ rule number_of_seqs_overview:
         f"{output_dir}/number_of_seqs_per_individual.csv"
     run:
         number_of_seqs_overview(input.files, output[0])
-    
+
+rule split_data:
+    """
+    Splits the data into training, validation and test sets.
+    """
+    input:
+        sequences_csv = f"{output_dir}/sampled_sequences.csv"
+    output:
+        training = f"{output_dir}/training_set.csv",
+        validation = f"{output_dir}/validation_set.csv",
+        test = f"{output_dir}/test_set.csv"
+    params:
+        training_fraction = config["training_fraction"],
+        validation_fraction = config["validation_fraction"]
+    run:
+        shell(f"bash split_data.sh {input.sequences_csv} {output.training} {output.validation} {output.test} {params.training_fraction} {params.validation_fraction}")
+
+rule csv_to_txt:
+    """
+    Converts the training, validation, and test sets to txt files containing only the sequences without metadata.
+    """
+    input:
+        training = f"{output_dir}/training_set.csv",
+        validation = f"{output_dir}/validation_set.csv",
+        test = f"{output_dir}/test_set.csv"
+    output:
+        training = f"{output_dir}/training.txt",
+        validation = f"{output_dir}/validation.txt",
+        test = f"{output_dir}/test.txt"
+    run:
+        csv_to_txt(input.training, output.training)
+        csv_to_txt(input.validation, output.validation)
+        csv_to_txt(input.test, output.test)
+
+rule model_training:
+    input:
+        training = f"{output_dir}/training.txt",
+        validation = f"{output_dir}/validation.txt",
+        test = f"{output_dir}/test.txt"
+    output:
+        directory(f"{output_dir}/model/")
+    run:
+        shell(f"python train_model.py {input.training} {input.validation} {input.test} {output[0]}")
