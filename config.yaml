@@ -65,7 +65,7 @@ filters:
   #Total_sequences:
     #min: 5
   Size_MB:
-    max: 100
+    max: 10
 
 columns_to_keep:
   - "locus"
@@ -95,11 +95,11 @@ resources:
 # Available options: "random", "balance_publications", "balance_individuals"
 sampling_scheme: "balance_publications"
 
-total_sequences: 1000
+total_sequences: 10
 
-download_dir: "/REDACTED/PATHratch/REDACTED/PATHne_downloading_test1"
-output_dir: "/REDACTED/PATHratch/REDACTED/PATHne_outputs_test1"
-linclust_dir: "/REDACTED/PATHratch/REDACTED/PATHne_linclust_test1"
+download_dir: "/REDACTED/PATHratch/REDACTED/PATHne_downloading_test3"
+output_dir: "/REDACTED/PATHratch/REDACTED/PATHne_outputs_test3"
+linclust_dir: "/REDACTED/PATHratch/REDACTED/PATHne_linclust_test3"
 
 n_lines: 1
 n_samples: 100000
