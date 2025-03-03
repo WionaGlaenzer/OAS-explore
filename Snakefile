@@ -25,13 +25,13 @@ logging.basicConfig(
 
 rule all:
     input:
-        f"{output_dir}/sequences.csv",
-        f"{output_dir}/data_to_download.csv",
-        f"{output_dir}/sequences.fasta",
-        f"{linclust_dir}/antibody_DB_clu_rep.fasta",
-        f"{output_dir}/sequences_filtered.csv",
-        f"{output_dir}/sequences_filtered_processed.csv",
-        f"{output_dir}/sampled_sequences.csv",
+        #f"{output_dir}/sequences.csv",
+        #f"{output_dir}/data_to_download.csv",
+        #f"{output_dir}/sequences.fasta",
+        #f"{linclust_dir}/antibody_DB_clu_rep.fasta",
+        #f"{output_dir}/sequences_filtered.csv",
+        #f"{output_dir}/sequences_filtered_processed.csv",
+        #f"{output_dir}/sampled_sequences.csv",
         f"{output_dir}/number_of_seqs_per_individual.csv",
         f"{output_dir}/test_set.csv",
         f"{output_dir}/training_set.csv",
