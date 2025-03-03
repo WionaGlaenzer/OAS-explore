@@ -1,0 +1,46 @@
+#!/bin/bash
+
+# Input parameters
+input_file="$1"
+training_file="$2"
+validation_file="$3"
+testing_file="$4"
+training_fraction="$5"
+validation_fraction="$6"
+
+# Calculate the testing fraction
+testing_fraction=$(echo "1 - $training_fraction - $validation_fraction" | bc -l)
+
+echo "Testing fraction: $testing_fraction"
+
+# Extract the header (first line) from the input file
+header=$(head -n 1 $input_file)
+
+# Shuffle the data lines (skip the header) directly
+tail -n +2 $input_file | shuf > shuffled_data.csv
+
+# Get the total number of data lines
+total_lines=$(wc -l < shuffled_data.csv)
+
+# Calculate the number of lines for training, validation, and testing
+training_lines=$(echo "$total_lines * $training_fraction" | bc | awk '{print int($1)}')
+validation_lines=$(echo "$total_lines * $validation_fraction" | bc | awk '{print int($1)}')
+testing_lines=$(echo "$total_lines * $testing_fraction" | bc | awk '{print int($1)}')
+
+# Save the training, validation, and testing files with the header line
+echo "$header" > $training_file
+head -n $training_lines shuffled_data.csv >> $training_file
+
+# Get the remaining lines for validation
+start_validation_line=$((training_lines + 1))
+end_validation_line=$((training_lines + validation_lines))
+echo "$header" > $validation_file
+sed -n "${start_validation_line},${end_validation_line}p" shuffled_data.csv >> $validation_file
+
+# Get the remaining lines for testing
+start_testing_line=$((training_lines + validation_lines + 1))
+echo "$header" > $testing_file
+sed -n "${start_testing_line},\$p" shuffled_data.csv >> $testing_file
+
+# Clean up the shuffled data file
+rm shuffled_data.csv

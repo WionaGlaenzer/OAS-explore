@@ -280,3 +280,26 @@ def number_of_seqs_overview(input_files, output_file):
     # sort dataframe in descending order by Number_of_sequences
     df_overview = df_overview.sort_values(by="Number_of_sequences", ascending=False)
     df_overview.to_csv(output_file, index=False)
+
+def csv_to_txt(input_file, output_file):
+    """
+    Converts a CSV file to a TXT file by concatenating specified columns from each row.
+    
+    Parameters:
+    - input_file: Path to the input CSV file.
+    - output_file: Path to the output TXT file.
+    """
+    columns = [3,4,5,6,7,8,9]
+    with open(input_file, 'r') as in_file, open(output_file, 'w') as out_file:
+        # Skip the header line
+        next(in_file)
+        
+        # Read each subsequent line
+        for line in in_file:
+            # Split the line into columns
+            cols = line.strip().split(',')
+            # Concatenate the specified columns
+            concatenated = ''.join([cols[i] for i in columns])  # Concatenate specified columns
+            # Write the concatenated result to the output TXT file
+            out_file.write(concatenated + '\n')
+
