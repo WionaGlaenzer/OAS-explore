@@ -1,4 +1,16 @@
-###### Data selection #####
+###### File paths #####
+
+#download_dir: "/REDACTED/PATH"
+#output_dir: "/REDACTED/PATH"
+#linclust_dir: "/REDACTED/PATH"
+
+output_dir: "/REDACTED/PATH"
+download_dir: "/REDACTED/PATH"
+linclust_dir: "/REDACTED/PATH"
+
+
+###### Data filtering #####
+
 # Filtering criteria
 filtering:
   max_sequences: 100000       # Limit dataset to 100,000 sequences
@@ -9,9 +21,6 @@ filtering:
 linclust:
   coverage: 0.9
   similarity: 0.9 # Remove sequences above 90% similarity
-
-training_fraction: 0.8
-validation_fraction: 0.1
 
 # Data filtering before download
 filters:
@@ -24,7 +33,8 @@ filters:
     #- "Kim et al., 2020"
     #- "Briney et al., 2019"
     #- "Soto et al., 2019"
-    - "Doria-Rose et al., 2015"
+    - "Waltari et al., 2018"
+    #- "Doria-Rose et al., 2015"
     #- "Eliyahu et al., 2015"
   #BSource:
     #- "PBMC"
@@ -64,8 +74,8 @@ filters:
     #- "IGHA"
   #Total_sequences:
     #min: 5
-  Size_MB:
-    max: 10
+  #Size_MB:
+  #  max: 10
 
 columns_to_keep:
   - "locus"
@@ -81,28 +91,15 @@ columns_to_keep:
   - "j_call"
   - "ANARCI_numbering"
 
-# Output settings
-output:
-  processed_dir: "data/processed"
-  log_dir: "logs"
-  report_file: "results/preprocessing_report.txt"
 
-# Computational settings
-resources:
-  threads: 4
-  memory: "16GB"
+###### Data sampling #####
 
+total_sequences: 10000
 # Available options: "random", "balance_publications", "balance_individuals"
-sampling_scheme: "balance_publications"
-
-total_sequences: 10
-
-download_dir: "/REDACTED/PATH"
-output_dir: "/REDACTED/PATH"
-linclust_dir: "/REDACTED/PATH"
-
+sampling_scheme: "balance_individuals"
 n_lines: 1
-n_samples: 100000
 
+training_fraction: 0.8
+validation_fraction: 0.1
 
 ###### Model settings #####

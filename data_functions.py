@@ -5,7 +5,9 @@ from os.path import basename
 import logging
 
 def select_files(filters, input_file="assets/OAS_overview.csv", output_file="outputs/data_to_download.csv"):
-    """Filters the dataset based on the given criteria and writes download links to a file."""
+    """
+    Filters the dataset based on the criteria given in config.yaml and writes download links to a file.
+    """
     
     logging.info(f"Applying filters: {filters}")
 
@@ -39,7 +41,7 @@ def select_files(filters, input_file="assets/OAS_overview.csv", output_file="out
 
 def csv_to_fasta(input_csv, output_fasta):
     """
-    Convert CSV file to FASTA format.
+    Convert CSV file to FASTA format to be used as input to linclust.
     Uses the Sequence_ID from the CSV as the sequence identifier.
     """
     with open(input_csv, 'r') as csv_file, open(output_fasta, 'w') as fasta_file:
@@ -58,7 +60,7 @@ def csv_to_fasta(input_csv, output_fasta):
 
 def filter_representative_sequences(fasta_file, input_csv, output_csv):
     """
-    Create a new CSV file containing only sequences that are in the representative FASTA file.
+    Create a new CSV file containing only sequences that are in the representative FASTA file from linclust.
     Handles FASTA headers in format '>Sequence_225'
     """
     # Read sequence IDs from FASTA file
@@ -119,7 +121,7 @@ def clean_and_parse_dict(column_value):
             return None
     return None
 
-def process_anarci_column(csv_file, output_file):
+def process_anarci_column_old(csv_file, output_file):
     """
     Process the ANARCI column in the CSV file and save the result to a new file.
     """
@@ -146,9 +148,46 @@ def process_anarci_column(csv_file, output_file):
     # Save the result to a new file
     df.to_csv(output_file, index=False)
 
+def process_anarci_column(csv_file, output_file, chunk_size=1000):
+    """
+    Process the ANARCI column in the CSV file line by line to reduce memory usage.
+    """
+    # Define length ranges for filtering
+    length_ranges = {
+        "fwr1_aa": (20, 200),
+        "cdr1_aa": (5, 12),
+        "cdr2_aa": (1, 10),
+        "cdr3_aa": (5, 38),
+        "fwr4_aa": (10, 200)
+    }
+    
+    # Open the output file and write the header first
+    with open(output_file, 'w') as f_out:
+        first_chunk = True
+        
+        for chunk in pd.read_csv(csv_file, chunksize=chunk_size):
+            # Clean and parse the ANARCI column
+            chunk["anarci_list"] = chunk["ANARCI_numbering"].apply(clean_and_parse_dict)
+            chunk["anarci_list"] = chunk["anarci_list"].apply(extract_keys_with_insertions)
+            
+            # Remove the ANARCI column
+            chunk = chunk.drop(columns=["ANARCI_numbering"])
+            
+            # Remove rows with empty required columns
+            chunk = chunk.dropna(subset=["fwr1_aa", "cdr1_aa", "fwr2_aa", "cdr2_aa", "fwr3_aa", "cdr3_aa", "fwr4_aa"])
+            
+            # Filter based on length requirements
+            for column, (min_length, max_length) in length_ranges.items():
+                chunk = chunk[chunk[column].apply(lambda x: min_length <= len(str(x)) <= max_length)]
+            
+            # Append to the output file
+            chunk.to_csv(f_out, mode='a', index=False, header=first_chunk)
+            first_chunk = False
+
 def get_sequences_per_individual(oas_overview, sequences):
     """
-    Get the number of sequences per individual from the OAS overview CSV file and the sequences CSV file.
+    For all sequences in the sequences CSV file, get the file ID
+    and associate it with the individual it comes from using the OAS overview.
     """
     # Read the OAS overview CSV file
     oas_overview = pd.read_csv(oas_overview)
@@ -161,16 +200,22 @@ def get_sequences_per_individual(oas_overview, sequences):
     # make dictionary with subject name as key and the file_indexes as a list as value
     files_per_individual = {individual: oas_overview[oas_overview["Subject"] == individual]["File_index"].unique().tolist() for individual in unique_individuals}
     # count number of rows in sequences file with the file_indexes in the files_per_individual dictionary
+    """
     for individual, files in files_per_individual.items():
         for file in files:
             count = sequences[sequences["File_ID"] == file].shape[0]
             print(f"{individual}: {file} - {count}")
     
     print(files_per_individual)
+    """
 
     return files_per_individual
 
 def separate_individuals(sequences, files_per_individual, output_folder):
+    """
+    Create a file for each individual. 
+    Write the sequences from the sequences CSV file that belong to that individual to the new file.
+    """
     os.makedirs(output_folder, exist_ok=True)
     created_files = []  # List to store created file names
     sequences = pd.read_csv(sequences)
@@ -201,7 +246,8 @@ def separate_individuals(sequences, files_per_individual, output_folder):
 
 def get_sequences_per_publication(oas_overview, sequences):
     """
-    Get the number of sequences per individual from the OAS overview CSV file and the sequences CSV file.
+    For all sequences in the sequences CSV file, get the file ID
+    and associate it with the publication it comes from using the OAS overview.
     """
     # Read the OAS overview CSV file
     oas_overview = pd.read_csv(oas_overview)
@@ -229,6 +275,10 @@ def get_sequences_per_publication(oas_overview, sequences):
     return files_per_publication, no_seqs_per_publication
 
 def separate_publications(sequences, files_per_publication, output_folder):
+    """
+    Create a file for each publication. 
+    Write the sequences from the sequences CSV file that belong to that individual to the new file.
+    """
     os.makedirs(output_folder, exist_ok=True)
     created_files = []  # List to store created file names
     sequences = pd.read_csv(sequences)
@@ -264,6 +314,10 @@ def separate_publications(sequences, files_per_publication, output_folder):
             f.write(file + "\n")
 
 def number_of_seqs_overview(input_files, output_file):
+    """
+    Create an overview of the number of sequences in each file (e.g. for sequences separated by individual or publication).
+    This can help in setting the number of sequences to sample from each group.
+    """
     filenames = []
     sequence_numbers = []
     # iterate through the files and save the number of sequences in each
