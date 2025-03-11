@@ -1,13 +1,14 @@
 ###### File paths #####
 
-#download_dir: "/REDACTED/PATH"
-#output_dir: "/REDACTED/PATH"
-#linclust_dir: "/REDACTED/PATH"
-
-output_dir: "/REDACTED/PATH"
 download_dir: "/REDACTED/PATH"
+output_dir: "/REDACTED/PATH"
 linclust_dir: "/REDACTED/PATH"
 
+#output_dir: "/REDACTED/PATH"
+#download_dir: "/REDACTED/PATH"
+#linclust_dir: "/REDACTED/PATH"
+cache_dir: "cluster/scratch/REDACTED/PATHngface_cache"
+training_environment: "/REDACTED/PATH"
 
 ###### Data filtering #####
 
@@ -103,3 +104,7 @@ training_fraction: 0.8
 validation_fraction: 0.1
 
 ###### Model settings #####
+
+model_name: "test_model"
+
+tokenizer: "/REDACTED/PATH"

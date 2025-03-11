@@ -30,13 +30,15 @@ rule all:
         #f"{output_dir}/sequences.fasta",
         #f"{linclust_dir}/antibody_DB_clu_rep.fasta",
         #f"{output_dir}/sequences_filtered.csv",
-        f"{output_dir}/sequences_filtered_processed.csv",
-        f"{output_dir}/sampled_sequences.csv",
-        f"{output_dir}/number_of_seqs_per_individual.csv",
-        f"{output_dir}/test_set.csv",
-        f"{output_dir}/training_set.csv",
-        f"{output_dir}/training.txt",
+        #f"{output_dir}/sequences_filtered_processed.csv",
+        #f"{output_dir}/number_of_seqs_per_individual.csv",
+        #f"{output_dir}/sampled_sequences.csv",
+        #f"{output_dir}/test_set.csv",
+        #f"{output_dir}/training_set.csv",
+        #f"{output_dir}/training.txt",
+        #"/REDACTED/PATH"
         #f"{output_dir}/download_progress.txt",
+        directory(f"{output_dir}/model/")
 
 rule select_files_to_download:
     """
@@ -300,10 +302,22 @@ rule csv_to_txt:
 
 rule model_training:
     input:
-        training = f"{output_dir}/training.txt",
-        validation = f"{output_dir}/validation.txt",
-        test = f"{output_dir}/test.txt"
+        training = f"{output_dir}/training1.txt",
+        validation = f"{output_dir}/validation1.txt",
+        test = f"{output_dir}/test1.txt"
+    params:
+        cache_dir = config["cache_dir"],
+        model_name = config["model_name"],
+        environment = config["training_environment"],
+        tokenizer = config["tokenizer"],
     output:
-        directory(f"{output_dir}/model/")
-    run:
-        shell(f"python train_model.py {input.training} {input.validation} {input.test} {output[0]}")
+        directory = directory(f"{output_dir}/model/"),
+        flag = f"{output_dir}/model/.done"  # This flag file marks completion
+    shell:
+        """
+        source {params.environment}/bin/activate
+        
+        mkdir -p {output.directory}
+        
+        bash submit_and_wait.sh "torchrun --nproc_per_node=1 train_model.py {input.training} {input.validation} {input.test} {params.cache_dir} {output.directory} {params.model_name} {output.flag} {params.tokenizer}"
+        """
