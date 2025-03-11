@@ -1,13 +1,14 @@
 ###### File paths #####
 
-#download_dir: "/REDACTED/PATHratch/REDACTED/PATHne_downloading_waltari2018"
-#output_dir: "/REDACTED/PATHratch/REDACTED/PATHne_outputs_waltari2018"
-#linclust_dir: "/REDACTED/PATHratch/REDACTED/PATHne_linclust_waltari2018"
+download_dir: "/REDACTED/PATHratch/REDACTED/PATHne_downloading_briney2019"
+output_dir: "/REDACTED/PATHratch/REDACTED/PATHne_outputs_briney2019"
+linclust_dir: "/REDACTED/PATHratch/REDACTED/PATHne_linclust_briney2019"
 
-output_dir: "/REDACTED/PATHroject/reddy/REDACTED/PATHn/Soto2019"
-download_dir: "/REDACTED/PATHroject/reddy/REDACTED/PATHn/Soto2019/download"
-linclust_dir: "/REDACTED/PATHroject/reddy/REDACTED/PATHn/Soto2019/linclust"
-
+#output_dir: "/REDACTED/PATHroject/reddy/REDACTED/PATHn/Soto2019"
+#download_dir: "/REDACTED/PATHroject/reddy/REDACTED/PATHn/Soto2019/download"
+#linclust_dir: "/REDACTED/PATHroject/reddy/REDACTED/PATHn/Soto2019/linclust"
+cache_dir: "cluster/scratch/REDACTED/PATHngface_cache"
+training_environment: "/REDACTED/PATHroject/reddy/REDACTED/PATHnvironments/training"
 
 ###### Data filtering #####
 
@@ -103,3 +104,7 @@ training_fraction: 0.8
 validation_fraction: 0.1
 
 ###### Model settings #####
+
+model_name: "test_model"
+
+tokenizer: "/REDACTED/PATHnzer/Coding/plm_training_pipeline/assets/antibody-tokenizer"
