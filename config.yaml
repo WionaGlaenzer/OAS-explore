@@ -1,13 +1,14 @@
 ###### File paths #####
 
-#download_dir: "/cluster/scratch/wglaenzer/data/pipeline_downloading_waltari2018"
-#output_dir: "/cluster/scratch/wglaenzer/data/pipeline_outputs_waltari2018"
-#linclust_dir: "/cluster/scratch/wglaenzer/data/pipeline_linclust_waltari2018"
+download_dir: "/cluster/scratch/wglaenzer/data/pipeline_downloading_briney2019"
+output_dir: "/cluster/scratch/wglaenzer/data/pipeline_outputs_briney2019"
+linclust_dir: "/cluster/scratch/wglaenzer/data/pipeline_linclust_briney2019"
 
-output_dir: "/cluster/project/reddy/wglaenzer/OAS_by_publication/Soto2019"
-download_dir: "/cluster/project/reddy/wglaenzer/OAS_by_publication/Soto2019/download"
-linclust_dir: "/cluster/project/reddy/wglaenzer/OAS_by_publication/Soto2019/linclust"
-
+#output_dir: "/cluster/project/reddy/wglaenzer/OAS_by_publication/Soto2019"
+#download_dir: "/cluster/project/reddy/wglaenzer/OAS_by_publication/Soto2019/download"
+#linclust_dir: "/cluster/project/reddy/wglaenzer/OAS_by_publication/Soto2019/linclust"
+cache_dir: "cluster/scratch/wglaenzer/huggingface_cache"
+training_environment: "/cluster/project/reddy/wglaenzer/environments/training"
 
 ###### Data filtering #####
 
@@ -103,3 +104,7 @@ training_fraction: 0.8
 validation_fraction: 0.1
 
 ###### Model settings #####
+
+model_name: "test_model"
+
+tokenizer: "/cluster/home/wglaenzer/Coding/plm_training_pipeline/assets/antibody-tokenizer"
