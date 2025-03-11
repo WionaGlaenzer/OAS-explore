@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 # Specify the input CSV file name
-input_file = "OAS_overview.csv"  # Replace with your actual CSV file
+input_file = "../assets/OAS_overview.csv"  # Replace with your actual CSV file
 
 # Read the CSV file into a pandas DataFrame
 print("starting to read in")
@@ -22,6 +22,13 @@ print(f"Total size in GB: {total_size_gb}")
 # Convert to TB and print
 total_size_tb = total_size_gb / 1024
 print(f"Total size in TB: {total_size_tb}")
+
+grouped_data = df.groupby(["Author"])["Unique_sequences"].sum()
+
+print(grouped_data)
+
+# save group by as a csv file
+grouped_data.to_csv("grouped_data.csv")
 
 def plot_grouped_data(df, group_columns, sum_column, y_label, title, file_name, log_scale=False):
     """
