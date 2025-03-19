@@ -7,7 +7,7 @@ linclust_dir: "/REDACTED/PATH"
 #output_dir: "/REDACTED/PATH"
 #download_dir: "/REDACTED/PATH"
 #linclust_dir: "/REDACTED/PATH"
-cache_dir: "cluster/scratch/REDACTED/PATHngface_cache"
+cache_dir: "/REDACTED/PATH"
 training_environment: "/REDACTED/PATH"
 
 ###### Data filtering #####
@@ -95,7 +95,7 @@ columns_to_keep:
 
 ###### Data sampling #####
 
-total_sequences: 10000
+total_sequences: 200000
 # Available options: "random", "balance_publications", "balance_individuals"
 sampling_scheme: "balance_individuals"
 n_lines: 1

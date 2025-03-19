@@ -4,7 +4,7 @@ import pandas as pd
 from data_functions import (select_files, csv_to_fasta, filter_representative_sequences, 
                           process_anarci_column, get_sequences_per_individual, separate_individuals,
                           get_sequences_per_publication, separate_publications, number_of_seqs_overview,
-                          csv_to_txt)
+                          csv_to_txt, round_robin_sampling)
 import glob
 import os
 import math
@@ -25,20 +25,21 @@ logging.basicConfig(
 
 rule all:
     input:
-        #f"{output_dir}/sequences.csv",
+        f"{output_dir}/sequences.csv",
         #f"{output_dir}/data_to_download.csv",
         #f"{output_dir}/sequences.fasta",
         #f"{linclust_dir}/antibody_DB_clu_rep.fasta",
-        #f"{output_dir}/sequences_filtered.csv",
-        #f"{output_dir}/sequences_filtered_processed.csv",
-        #f"{output_dir}/number_of_seqs_per_individual.csv",
+        f"{output_dir}/sequences_filtered.csv",
+        f"{output_dir}/sequences_filtered_processed.csv",
+        f"{output_dir}/number_of_seqs_per_individual.csv",
         #f"{output_dir}/sampled_sequences.csv",
         #f"{output_dir}/test_set.csv",
         #f"{output_dir}/training_set.csv",
         #f"{output_dir}/training.txt",
         #"/REDACTED/PATH"
         #f"{output_dir}/download_progress.txt",
-        directory(f"{output_dir}/model/")
+        f"{output_dir}/sampled_sequences_round_robin.csv",
+        #directory(f"{output_dir}/model/")
 
 rule select_files_to_download:
     """
@@ -302,9 +303,9 @@ rule csv_to_txt:
 
 rule model_training:
     input:
-        training = f"{output_dir}/training1.txt",
-        validation = f"{output_dir}/validation1.txt",
-        test = f"{output_dir}/test1.txt"
+        training = f"{output_dir}/training.txt",
+        validation = f"{output_dir}/validation.txt",
+        test = f"{output_dir}/test.txt"
     params:
         cache_dir = config["cache_dir"],
         model_name = config["model_name"],
@@ -321,3 +322,19 @@ rule model_training:
         
         bash submit_and_wait.sh "torchrun --nproc_per_node=1 train_model.py {input.training} {input.validation} {input.test} {params.cache_dir} {output.directory} {params.model_name} {output.flag} {params.tokenizer}"
         """
+
+rule sample_by_publication_round_robin:
+    """
+    Samples sequences in a round-robin fashion from each publication until the total number of sequences specified in the config file is reached.
+    """
+    input:
+        flag = f"{output_dir}/sequences_per_individual/.done",
+        files = lambda wildcards: glob.glob(f"{output_dir}/sequences_per_individual/*.csv")
+    output:
+        file = f"{output_dir}/sampled_sequences_round_robin.csv",
+        flag = touch(f"{output_dir}/sampled_sequences_by_individual_round_robin/.done")
+    params:
+        total_sequences = config["total_sequences"]
+    run:
+        shell(f"mkdir -p $(dirname {output.file})")
+        round_robin_sampling(input.files, params.total_sequences, output.file)

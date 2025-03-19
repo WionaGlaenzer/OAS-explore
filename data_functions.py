@@ -1,8 +1,10 @@
 import pandas as pd
 import sys
 import os
-from os.path import basename
+from os.path import basename, splitext, dirname
 import logging
+from itertools import cycle
+import matplotlib.pyplot as plt
 
 def select_files(filters, input_file="assets/OAS_overview.csv", output_file="outputs/data_to_download.csv"):
     """
@@ -357,3 +359,66 @@ def csv_to_txt(input_file, output_file):
             # Write the concatenated result to the output TXT file
             out_file.write(concatenated + '\n')
 
+def round_robin_sampling(files, total_sequences, output_file):
+    """
+    Samples sequences as close to evenly as possible from multiple CSV files by 
+    sampling equally from files and successively excluding exhausted files.
+    Also creates a bar plot showing how many sequences were sampled from each file.
+    """
+    
+    files = files
+    file_iters = {file: iter(pd.read_csv(file, chunksize=1)) for file in files}
+    sampled_sequences = []
+    
+    # Track sequences sampled from each file
+    samples_per_file = {basename(file): 0 for file in files}
+    
+    while len(sampled_sequences) < total_sequences:
+        for file in files[:]:  # Copy list to allow modification
+            try:
+                chunk = next(file_iters[file])
+                sampled_sequences.append(chunk)
+                samples_per_file[basename(file)] += 1
+                
+                if len(sampled_sequences) >= total_sequences:
+                    break
+            except StopIteration:
+                files.remove(file)  # Remove exhausted file
+        
+        # Exit if all files are exhausted
+        if not files:
+            break
+    
+    final_df = pd.concat(sampled_sequences, ignore_index=True)
+    final_df.to_csv(output_file, index=False)
+    
+    # Create bar plot showing distribution of sampled sequences
+    plt.figure(figsize=(12, 8))
+    
+    # Sort by number of samples for better visualization
+    sorted_items = sorted(samples_per_file.items(), key=lambda x: x[1], reverse=True)
+    files_sorted = [item[0] for item in sorted_items]
+    counts_sorted = [item[1] for item in sorted_items]
+    
+    # Create bar chart
+    bars = plt.bar(range(len(files_sorted)), counts_sorted, color='skyblue')
+    
+    # Add value labels on top of each bar
+    for i, bar in enumerate(bars):
+        height = bar.get_height()
+        plt.text(bar.get_x() + bar.get_width()/2., height + 0.1,
+                f'{height}', ha='center', va='bottom', rotation=0)
+    
+    # Set labels and title
+    plt.xlabel('Source Files')
+    plt.ylabel('Number of Sequences Sampled')
+    plt.title('Sequences Sampled per File')
+    
+    # Format x-axis labels for readability
+    plt.xticks(range(len(files_sorted)), files_sorted, rotation=90)
+    plt.tight_layout()
+    
+    # Save plot next to the output file
+    plot_file = os.path.join(dirname(output_file), 'sampling_distribution.png')
+    plt.savefig(plot_file)
+    plt.close()
