@@ -7,7 +7,7 @@ linclust_dir: "/cluster/scratch/wglaenzer/data/pipeline_linclust_briney2019"
 #output_dir: "/cluster/project/reddy/wglaenzer/OAS_by_publication/Soto2019"
 #download_dir: "/cluster/project/reddy/wglaenzer/OAS_by_publication/Soto2019/download"
 #linclust_dir: "/cluster/project/reddy/wglaenzer/OAS_by_publication/Soto2019/linclust"
-cache_dir: "cluster/scratch/wglaenzer/huggingface_cache"
+cache_dir: "/cluster/scratch/wglaenzer/huggingface_cache"
 training_environment: "/cluster/project/reddy/wglaenzer/environments/training"
 
 ###### Data filtering #####
@@ -95,7 +95,7 @@ columns_to_keep:
 
 ###### Data sampling #####
 
-total_sequences: 10000
+total_sequences: 200000
 # Available options: "random", "balance_publications", "balance_individuals"
 sampling_scheme: "balance_individuals"
 n_lines: 1
