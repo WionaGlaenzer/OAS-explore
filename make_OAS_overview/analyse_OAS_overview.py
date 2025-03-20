@@ -9,6 +9,10 @@ print("starting to read in")
 df = pd.read_csv(input_file, sep=",")
 print("read in the file")
 
+# Print all unique publication titles
+unique_publications = df["Author"].unique()
+print(f"Unique publications: {unique_publications}")
+
 # Sum the "size_MB" column (make sure it's numeric)
 total_size = df["Size_MB"].sum()
 
