@@ -1,12 +1,12 @@
 ###### File paths #####
 
-download_dir: "/REDACTED/PATHratch/REDACTED/PATHne_downloading_briney2019"
-output_dir: "/REDACTED/PATHratch/REDACTED/PATHne_outputs_briney2019"
-linclust_dir: "/REDACTED/PATHratch/REDACTED/PATHne_linclust_briney2019"
+#download_dir: "/REDACTED/PATHratch/REDACTED/PATHne_downloading_briney2019"
+#output_dir: "/REDACTED/PATHratch/REDACTED/PATHne_outputs_briney2019"
+#linclust_dir: "/REDACTED/PATHratch/REDACTED/PATHne_linclust_briney2019"
 
-#output_dir: "/REDACTED/PATHroject/reddy/REDACTED/PATHn/Soto2019"
-#download_dir: "/REDACTED/PATHroject/reddy/REDACTED/PATHn/Soto2019/download"
-#linclust_dir: "/REDACTED/PATHroject/reddy/REDACTED/PATHn/Soto2019/linclust"
+output_dir: "/REDACTED/PATHroject/reddy/REDACTED/PATHn/OAS_wo_Soto/output"
+download_dir: "/REDACTED/PATHroject/reddy/REDACTED/PATHn/OAS_wo_Soto/download"
+linclust_dir: "/REDACTED/PATHroject/reddy/REDACTED/PATHn/OAS_wo_Soto/linclust"
 cache_dir: "/REDACTED/PATHratch/REDACTED/PATHngface_cache"
 training_environment: "/REDACTED/PATHroject/reddy/REDACTED/PATHnvironments/training"
 
@@ -29,14 +29,92 @@ filters:
     #- "rabbit"
     - "human"
   Author: # Use the publication name as it appears on OAS
-    #- "Banerjee et al., 2017"
-    #- "Bashford et al., 2013"
-    #- "Kim et al., 2020"
-    #- "Briney et al., 2019"
-    #- "Soto et al., 2019"
-    - "Waltari et al., 2018"
-    #- "Doria-Rose et al., 2015"
-    #- "Eliyahu et al., 2015"
+    - 'Bashford et al., 2013'
+    - 'Bender et al., 2020'
+    - 'Bernardes et al., 2020'
+    - 'Bernat et al., 2019'
+    - 'Bhiman et al., 2015'
+    - 'Bolland et al., 2016'
+    - 'Bonsignori et al., 2016'
+    - 'Briney et al., 2019'
+    - 'Buchheim et al., 2020'
+    - 'Chen et al., 2020'
+    - 'Collins et al., 2015'
+    - 'Corcoran et al., 2016'
+    - 'Cui et al., 2019'
+    - 'Davis et al., 2019'
+    - 'Doria-Rose et al., 2015'
+    - 'Eccles et al., 2020'
+    - 'Eliyahu et al., 2015'
+    - 'Ellebedy et al., 2016'
+    - 'Fisher et al., 2017' 
+    - 'Galson_2015 et al., 2015'
+    - 'Galson et al., 2015'
+    - 'Galson et al., 2016'
+    - 'Galson et al., 2020'
+    - 'Ghraichy et al., 2020'
+    - 'Gidoni et al., 2019'
+    - 'Greiff et al., 2014'
+    - 'Greif et al., 2015'
+    - 'Greiff et al., 2017'
+    - 'Gupta et al., 2017'
+    - 'Halliley et al., 2015'
+    - 'Huang et al., 2016'
+    - 'Jaffe et al., 2022'
+    - 'Jiang et al., 2013'
+    - 'Johnson et al., 2018'
+    - 'Joyce et al., 2016'
+    - 'Khan et al., 2016'
+    - 'Kim et al., 2020'
+    - 'King et al., 2020'
+    - 'Kuri-Cervantes et al., 2020' 
+    - 'Levin et al., 2016'
+    - 'Levin et al., 2017'
+    - 'Li et al., 2017'
+    - 'Liao et al., 2013'
+    - 'Lindner et al., 2015'
+    - 'Meng et al., 2017'
+    - 'Menzel et al., 2014'
+    - 'Montague et al., 2021'
+    - 'Mor et al., 2021'
+    - 'Mroczek et al., 2014'
+    - 'Mukhamedova et al. 2021'
+    - 'Nielsen et al., 2020'
+    - 'Ohm-Laursen et al., 2018'
+    - 'Ota et al., 2010'
+    - 'Palanichamy et al., 2014'
+    - 'Parameswaran et al., 2014'
+    - 'Prohaska et al., 2018'
+    - 'Rettig et al., 2018'
+    - 'Richardson et al., 2022'
+    - 'Rubelt et al., 2016'
+    - 'Schanz et al., 2014'
+    - 'Schultheiss et al., 2020'
+    - 'Setliff et al., 2018'
+    - 'Sevy et al., 2019'
+    - 'Sheng et al., 2017'
+    - 'Simonich et al., 2020'
+    - 'Soto et al., 2016'
+    #- 'Soto et al., 2019'
+    - 'Stern et al., 2014'
+    - 'Sundling et al., 2014'
+    - 'Tipton et al., 2015'
+    - 'Tong et al., 2017'
+    - 'Turchaninova et al., 2015'
+    - 'Turner et al., 2021'
+    - 'VanDuijn et al., 2017'
+    - 'Vander Heiden et al., 2017'
+    - 'Vergani et al., 2017'
+    - 'Waltari et al., 2018'
+    - 'Wesemann et al., 2013'
+    - 'Woodruff et al., 2020'
+    - 'Wu et al., 2011' 
+    - 'Wu et al., 2014'
+    - 'Wu et al., 2015'
+    - 'Zhou et al., 2013'
+    - 'Zhou et al., 2015'
+    - 'Zhu et al., 2012'
+    - 'Zhu et al., 2013'
   #BSource:
     #- "PBMC"
     #- "Spleen"
@@ -75,8 +153,8 @@ filters:
     #- "IGHA"
   #Total_sequences:
     #min: 5
-  #Size_MB:
-  #  max: 10
+  #ize_MB:
+    #max: 10
 
 columns_to_keep:
   - "locus"
@@ -91,11 +169,12 @@ columns_to_keep:
   - "d_call"
   - "j_call"
   - "ANARCI_numbering"
+  - "Redundancy"
 
 
 ###### Data sampling #####
 
-total_sequences: 200000
+total_sequences: 135000000
 # Available options: "random", "balance_publications", "balance_individuals"
 sampling_scheme: "balance_individuals"
 n_lines: 1

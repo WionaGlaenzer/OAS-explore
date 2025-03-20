@@ -1,15 +1,5 @@
-# This is the antiberta notebook from the publication as a python script
+# Training script modified form Leem et al.
 import sys
-training_file = sys.argv[1]
-test_file = sys.argv[2]
-val_file = sys.argv[3]
-cache_dir = sys.argv[4]
-out_dir = sys.argv[5]
-model_name = sys.argv[6]
-flag_file = sys.argv[7]
-tokenizer_path = sys.argv[8]
-
-# Imports
 from transformers import (
     RobertaConfig,
     RobertaTokenizer,
@@ -20,8 +10,19 @@ from transformers import (
 )
 from datasets import load_dataset
 import datasets
-datasets.disable_progress_bar() 
 import os
+
+datasets.disable_progress_bar() 
+
+training_file = sys.argv[1]
+test_file = sys.argv[2]
+val_file = sys.argv[3]
+cache_dir = sys.argv[4]
+out_dir = sys.argv[5]
+model_name = sys.argv[6]
+flag_file = sys.argv[7]
+tokenizer_path = sys.argv[8]
+deepspeed_config = sys.argv[9]
 
 # Initialise the tokeniser
 tokenizer = RobertaTokenizer.from_pretrained(tokenizer_path)
@@ -79,7 +80,6 @@ model_config = RobertaConfig(
 model = RobertaForMaskedLM(model_config)
 
 # Construct training arguments
-# Huggingface uses a default seed of 42
 args = TrainingArguments(
     #disable_tqdm=True, #added to disable the progress bar
     output_dir=out_dir,
@@ -89,6 +89,7 @@ args = TrainingArguments(
     max_steps=1000, #originally 225000
     save_steps=2500,#originally 2500
     logging_steps=2500, #originally 2500
+    logging_dir=f"{out_dir}/logs",
     adam_beta2=0.98,
     adam_epsilon=1e-6,
     weight_decay=0.01,
@@ -97,7 +98,8 @@ args = TrainingArguments(
     gradient_accumulation_steps=antiberta_config.get("gradient_accumulation_steps", 1),
     fp16=True, #comment this out for training on CPU
     evaluation_strategy="steps",
-    seed=42
+    seed=42,
+    deepspeed=deepspeed_config,
 )
 
 ### Setup the HuggingFace Trainer
