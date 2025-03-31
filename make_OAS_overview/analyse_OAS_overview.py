@@ -9,6 +9,44 @@ print("starting to read in")
 df = pd.read_csv(input_file, sep=",")
 print("read in the file")
 
+# Make a histogram with the number of sequences per age
+# Drop rows where "Age" or "Unique_sequences" contain "no" or NaN
+df_clean = df[(df["Age"] != "no") & (df["Unique_sequences"] != "no")].dropna(subset=["Age", "Unique_sequences"])
+
+# Convert columns to numeric
+df_clean["Age"] = pd.to_numeric(df_clean["Age"], errors="coerce")
+df_clean["Unique_sequences"] = pd.to_numeric(df_clean["Unique_sequences"], errors="coerce")
+
+# Drop any remaining NaN values after conversion
+df_clean = df_clean.dropna(subset=["Age", "Unique_sequences"])
+
+# Create a weighted histogram
+plt.figure(figsize=(10, 6))
+plt.hist(df_clean["Age"], bins=20, weights=df_clean["Unique_sequences"], edgecolor="black", alpha=0.7)
+
+# Labels and title
+plt.xlabel("Age")
+plt.ylabel("Number of Unique Sequences")
+plt.title("Histogram of Unique Sequences per Age")
+plt.grid(axis="y", linestyle="--", alpha=0.7)
+
+# Save the plot as a PDF
+plt.savefig("sequences_per_age.pdf", format="pdf")
+print(f"Histogram saved as sequences_per_age.pdf")
+
+
+# Print the names of all publications that have files with individual "no"
+print(df[df["Subject"] == "no"]["Author"].unique())
+
+# Get all individuals names that are present in several publications and all publications they are present in
+individual_counts = df.groupby("Subject")["Author"].nunique()
+multiple_publications = individual_counts[individual_counts > 1].index
+
+# Get all publications for each of these individuals
+for individual in multiple_publications:
+    publications = df[df["Subject"] == individual]["Author"].unique()
+    print(f"Individual: {individual}, Publications: {list(publications)}")
+
 # Print all unique publication titles
 unique_publications = df["Author"].unique()
 print(f"Unique publications: {unique_publications}")
