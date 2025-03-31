@@ -365,60 +365,66 @@ def round_robin_sampling(files, total_sequences, output_file):
     sampling equally from files and successively excluding exhausted files.
     Also creates a bar plot showing how many sequences were sampled from each file.
     """
-    
-    files = files
+
     file_iters = {file: iter(pd.read_csv(file, chunksize=1)) for file in files}
-    sampled_sequences = []
     
     # Track sequences sampled from each file
     samples_per_file = {basename(file): 0 for file in files}
+
+    with open(output_file, 'w', newline='') as f_out:
+        header_written = False
+
+        sampled_count = 0
+        active_files = set(files)
     
-    while len(sampled_sequences) < total_sequences:
-        for file in files[:]:  # Copy list to allow modification
-            try:
-                chunk = next(file_iters[file])
-                sampled_sequences.append(chunk)
-                samples_per_file[basename(file)] += 1
+        while sampled_count < total_sequences and active_files:
+            for file in list(active_files):
+                try:
+                    chunk = next(file_iters[file])
+
+                    # Write to file
+                    chunk.to_csv(f_out, header=not header_written, index=False, mode='a')
+                    header_written = True
+
+                    # Update count
+                    samples_per_file[basename(file)] += 1
+                    sampled_count += 1
                 
-                if len(sampled_sequences) >= total_sequences:
-                    break
-            except StopIteration:
-                files.remove(file)  # Remove exhausted file
-        
-        # Exit if all files are exhausted
-        if not files:
-            break
-    
-    final_df = pd.concat(sampled_sequences, ignore_index=True)
-    final_df.to_csv(output_file, index=False)
-    
-    # Create bar plot showing distribution of sampled sequences
+                    if sampled_count >= total_sequences:
+                        break
+                except StopIteration:
+                    active_files.remove(file)  # Remove exhausted file
+
+    # Generate bar plot for sampling distribution
+    plot_sampling_distribution(samples_per_file, output_file)
+
+
+def plot_sampling_distribution(samples_per_file, output_file):
+    """Generates and saves a bar plot of sampled sequences per file."""
     plt.figure(figsize=(12, 8))
-    
-    # Sort by number of samples for better visualization
+
+    # Sort for better visualization
     sorted_items = sorted(samples_per_file.items(), key=lambda x: x[1], reverse=True)
-    files_sorted = [item[0] for item in sorted_items]
-    counts_sorted = [item[1] for item in sorted_items]
-    
-    # Create bar chart
+    files_sorted, counts_sorted = zip(*sorted_items) if sorted_items else ([], [])
+
+    # Plot bar chart
     bars = plt.bar(range(len(files_sorted)), counts_sorted, color='skyblue')
-    
-    # Add value labels on top of each bar
+
+    # Annotate values on bars
     for i, bar in enumerate(bars):
-        height = bar.get_height()
-        plt.text(bar.get_x() + bar.get_width()/2., height + 0.1,
-                f'{height}', ha='center', va='bottom', rotation=0)
-    
-    # Set labels and title
+        plt.text(bar.get_x() + bar.get_width()/2., bar.get_height() + 0.1, 
+                 f'{bar.get_height()}', ha='center', va='bottom')
+
+    # Labels and title
     plt.xlabel('Source Files')
     plt.ylabel('Number of Sequences Sampled')
     plt.title('Sequences Sampled per File')
-    
+
     # Format x-axis labels for readability
     plt.xticks(range(len(files_sorted)), files_sorted, rotation=90)
     plt.tight_layout()
-    
-    # Save plot next to the output file
+
+    # Save plot next to output file
     plot_file = os.path.join(dirname(output_file), 'sampling_distribution.png')
     plt.savefig(plot_file)
     plt.close()
