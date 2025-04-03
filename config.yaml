@@ -174,7 +174,7 @@ columns_to_keep:
 
 ###### Data sampling #####
 
-total_sequences: 135000000
+total_sequences: 10000
 # Available options: "random", "balance_publications", "balance_individuals"
 sampling_scheme: "balance_individuals"
 n_lines: 1
