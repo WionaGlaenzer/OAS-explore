@@ -5,6 +5,7 @@ from os.path import basename, splitext, dirname
 import logging
 from itertools import cycle
 import matplotlib.pyplot as plt
+import re
 
 def select_files(filters, input_file="assets/OAS_overview.csv", output_file="outputs/data_to_download.csv"):
     """
@@ -186,7 +187,7 @@ def process_anarci_column(csv_file, output_file, chunk_size=1000):
             chunk.to_csv(f_out, mode='a', index=False, header=first_chunk)
             first_chunk = False
 
-def get_sequences_per_individual(oas_overview, sequences):
+def get_sequences_per_individual_old(oas_overview, sequences):
     """
     For all sequences in the sequences CSV file, get the file ID
     and associate it with the individual it comes from using the OAS overview.
@@ -212,6 +213,41 @@ def get_sequences_per_individual(oas_overview, sequences):
     """
 
     return files_per_individual
+
+def get_sequences_per_individual(oas_overview, sequences):
+    """
+    For all sequences in the sequences CSV file, get the file ID
+    and associate it with the individual it comes from using the OAS overview.
+    """
+    # Read the OAS overview CSV file
+    oas_overview = pd.read_csv(oas_overview)
+    # Read the sequences CSV file
+    sequences = pd.read_csv(sequences)
+    
+    # Get all unique files from the sequences CSV file
+    indices = sequences["File_ID"].unique()
+    oas_overview = oas_overview[oas_overview["File_index"].isin(indices)]
+    
+    files_per_individual = {}
+    
+    for _, row in oas_overview.iterrows():
+        individual = row["Subject"]
+        file_index = row["File_index"]
+        publication = re.sub(r'\W+', '_', row["Author"]) if "Author" in row else "Unknown"
+        
+        # If individual is "no", separate entries by publication
+        if individual == "no":
+            key = f"no_{publication}"
+        else:
+            key = individual
+        
+        if key not in files_per_individual:
+            files_per_individual[key] = set()
+        
+        files_per_individual[key].add(file_index)
+    
+    # Convert sets to lists before returning
+    return {key: list(files) for key, files in files_per_individual.items()}
 
 def separate_individuals(sequences, files_per_individual, output_folder):
     """
