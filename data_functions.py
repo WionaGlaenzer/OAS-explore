@@ -6,6 +6,9 @@ import logging
 from itertools import cycle
 import matplotlib.pyplot as plt
 import re
+import numpy as np
+import pandas as pd
+import ast
 
 def select_files(filters, input_file="assets/OAS_overview.csv", output_file="outputs/data_to_download.csv"):
     """
@@ -86,10 +89,6 @@ def filter_representative_sequences(fasta_file, input_csv, output_csv):
             seq_id = line.split(',')[0]  # Get the ID from first column
             if seq_id in representative_ids:
                 out_f.write(line)
-
-import pandas as pd
-import ast
-
 
 # Function to extract keys as a list, accounting for insertions
 def extract_keys_with_insertions(parsed_dict):
@@ -437,14 +436,14 @@ def round_robin_sampling(files, total_sequences, output_file):
 
 def plot_sampling_distribution(samples_per_file, output_file):
     """Generates and saves a bar plot of sampled sequences per file."""
-    plt.figure(figsize=(12, 8))
+    plt.figure(figsize=(60, 12))
 
     # Sort for better visualization
     sorted_items = sorted(samples_per_file.items(), key=lambda x: x[1], reverse=True)
     files_sorted, counts_sorted = zip(*sorted_items) if sorted_items else ([], [])
 
     # Plot bar chart
-    bars = plt.bar(range(len(files_sorted)), counts_sorted, color='skyblue')
+    bars = plt.bar(range(len(files_sorted)), counts_sorted, color=np.random.rand(len(files_sorted), 3))
 
     # Annotate values on bars
     for i, bar in enumerate(bars):
@@ -454,10 +453,11 @@ def plot_sampling_distribution(samples_per_file, output_file):
     # Labels and title
     plt.xlabel('Source Files')
     plt.ylabel('Number of Sequences Sampled')
-    plt.title('Sequences Sampled per File')
+    plt.title('Round Robin Sampling Distribution')
 
     # Format x-axis labels for readability
-    plt.xticks(range(len(files_sorted)), files_sorted, rotation=90)
+    plt.xticks(range(len(files_sorted)), files_sorted, rotation=90, ha='right')
+    #plt.yticks(fontsize=4)
     plt.tight_layout()
 
     # Save plot next to output file
