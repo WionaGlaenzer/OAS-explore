@@ -283,7 +283,7 @@ rule split_data:
         training_fraction = config["training_fraction"],
         validation_fraction = config["validation_fraction"]
     run:
-        shell(f"bash split_data.sh {input.sequences_csv} {output.training} {output.validation} {output.test} {params.training_fraction} {params.validation_fraction}")
+        shell(f"bash split_data.sh {input.sequences_csv} {output.training} {output.validation} {output.test} {params.training_fraction} {params.validation_fraction} 0 {output_dir}")
 
 rule csv_to_txt:
     """
