@@ -15,3 +15,10 @@ module load python/3.11.6 cuda/12.1.1 ninja/1.11.1
 python3.11 -m venv pipeline
 source pipeline/bin/activate
 pip install -r requirements.txt
+
+## Log in to weights and biases
+
+- Make sure you have created a *training environment* for model training
+- Activate the *training environment*
+- Run "wandb login"
+- Enter the API key from the weights and biases website. If you don't have an account yet, create a free account first.

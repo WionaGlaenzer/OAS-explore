@@ -31,16 +31,16 @@ rule all:
         #f"{linclust_dir}/antibody_DB_clu_rep.fasta",
         #f"{output_dir}/sequences_filtered.csv",
         #f"{output_dir}/sequences_filtered_processed.csv",
-        f"{output_dir}/number_of_seqs_per_individual.csv",
+        #f"{output_dir}/number_of_seqs_per_individual.csv",
         #f"{output_dir}/sampled_sequences.csv",
         #f"{output_dir}/test_set.csv",
         #f"{output_dir}/training_set.csv",
         #f"{output_dir}/training.txt",
         #"/REDACTED/PATH"
         #f"{output_dir}/download_progress.txt",
-        f"{output_dir}/sampled_sequences_round_robin.csv",
-        #directory(f"{output_dir}/model/")
-        f"{output_dir}/sequences_per_individual/.done"
+        #f"{output_dir}/sampled_sequences_round_robin.csv",
+        directory(f"{output_dir}/model/")
+        #f"{output_dir}/sequences_per_individual/.done"
 
 rule select_files_to_download:
     """
@@ -312,17 +312,27 @@ rule model_training:
         model_name = config["model_name"],
         environment = config["training_environment"],
         tokenizer = config["tokenizer"],
+        deepspeed_config = "assets/deepspeed_config.json"
+        wandb_base_dir = config["wandb_base_dir"]
     output:
         directory = directory(f"{output_dir}/model/"),
         flag = f"{output_dir}/model/.done"  # This flag file marks completion
     shell:
-        """
+        '''
         source {params.environment}/bin/activate
         
         mkdir -p {output.directory}
+
+        RPORT=$((RANDOM % 55535 + 10000))
         
-        bash submit_and_wait.sh "torchrun --nproc_per_node=1 train_model.py {input.training} {input.validation} {input.test} {params.cache_dir} {output.directory} {params.model_name} {output.flag} {params.tokenizer}"
-        """
+        bash submit_and_wait.sh "
+        echo 'CUDA_HOME is set to: $CUDA_HOME'
+        echo \\"Using rendezvous port: $RPORT\\"
+        export WANDB_DIR='{params.wandb_base_dir}';
+        torchrun --nproc_per_node=auto --rdzv-backend=c10d --rdzv-endpoint=\\"localhost:$RPORT\\" \
+        train_model.py {input.training} {input.validation} {input.test} {params.cache_dir} \
+        {output.directory} {params.model_name} {output.flag} {params.tokenizer} {params.deepspeed_config}"
+        '''
 
 rule sample_by_publication_round_robin:
     """

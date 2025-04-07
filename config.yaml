@@ -9,6 +9,7 @@ download_dir: "/REDACTED/PATH"
 linclust_dir: "/REDACTED/PATH"
 cache_dir: "/REDACTED/PATH"
 training_environment: "/REDACTED/PATH"
+wandb_base_dir: "/REDACTED/PATH"
 
 ###### Data filtering #####
 
