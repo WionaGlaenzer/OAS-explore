@@ -4,11 +4,12 @@
 #output_dir: "/cluster/scratch/wglaenzer/data/pipeline_outputs_briney2019"
 #linclust_dir: "/cluster/scratch/wglaenzer/data/pipeline_linclust_briney2019"
 
-output_dir: "/cluster/project/reddy/wglaenzer/OAS_by_publication/OAS_wo_Soto/output"
+output_dir: "/cluster/project/reddy/wglaenzer/final_training_testing_val_data/test"
 download_dir: "/cluster/project/reddy/wglaenzer/OAS_by_publication/OAS_wo_Soto/download"
 linclust_dir: "/cluster/project/reddy/wglaenzer/OAS_by_publication/OAS_wo_Soto/linclust"
 cache_dir: "/cluster/scratch/wglaenzer/huggingface_cache"
 training_environment: "/cluster/project/reddy/wglaenzer/environments/training"
+wandb_base_dir: "/cluster/project/reddy/wglaenzer/final_training_testing_val_data/test"
 
 ###### Data filtering #####
 
