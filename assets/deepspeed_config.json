@@ -42,7 +42,8 @@
     "wall_clock_breakdown": false,
 
     "checkpoint": {
-        "load_universal": true
+        "load_universal": false,
+        "load_optimizer_states": true
     },
 
     "wandb": {

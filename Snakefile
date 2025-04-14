@@ -27,11 +27,11 @@ rule all:
     input:
         #f"{output_dir}/sequences.csv",
         #f"{output_dir}/data_to_download.csv",
-        #f"{output_dir}/sequences.fasta",
-        #f"{linclust_dir}/antibody_DB_clu_rep.fasta",
-        #f"{output_dir}/sequences_filtered.csv",
-        #f"{output_dir}/sequences_filtered_processed.csv",
-        #f"{output_dir}/number_of_seqs_per_individual.csv",
+        f"{output_dir}/sequences.fasta",
+        f"{linclust_dir}/antibody_DB_clu_rep.fasta",
+        f"{output_dir}/sequences_filtered.csv",
+        f"{output_dir}/sequences_filtered_processed.csv",
+        f"{output_dir}/number_of_seqs_per_individual.csv",
         #f"{output_dir}/sampled_sequences.csv",
         #f"{output_dir}/test_set.csv",
         #f"{output_dir}/training_set.csv",
@@ -39,8 +39,8 @@ rule all:
         #"/REDACTED/PATHratch/REDACTED/PATHne_outputs_briney2019/training.txt"
         #f"{output_dir}/download_progress.txt",
         #f"{output_dir}/sampled_sequences_round_robin.csv",
-        directory(f"{output_dir}/model/")
-        #f"{output_dir}/sequences_per_individual/.done"
+        directory(f"{output_dir}/model/"),
+        f"{output_dir}/sequences_per_individual/.done"
 
 rule select_files_to_download:
     """
@@ -312,7 +312,7 @@ rule model_training:
         model_name = config["model_name"],
         environment = config["training_environment"],
         tokenizer = config["tokenizer"],
-        deepspeed_config = "assets/deepspeed_config.json"
+        deepspeed_config = "assets/deepspeed_config.json",
         wandb_base_dir = config["wandb_base_dir"]
     output:
         directory = directory(f"{output_dir}/model/"),

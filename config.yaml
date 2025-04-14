@@ -4,7 +4,7 @@
 #output_dir: "/REDACTED/PATHratch/REDACTED/PATHne_outputs_briney2019"
 #linclust_dir: "/REDACTED/PATHratch/REDACTED/PATHne_linclust_briney2019"
 
-output_dir: "/REDACTED/PATHroject/reddy/REDACTED/PATHnal_training_testing_val_data/test"
+output_dir: "/REDACTED/PATHroject/reddy/REDACTED/PATHn/OAS_wo_Soto/output"
 download_dir: "/REDACTED/PATHroject/reddy/REDACTED/PATHn/OAS_wo_Soto/download"
 linclust_dir: "/REDACTED/PATHroject/reddy/REDACTED/PATHn/OAS_wo_Soto/linclust"
 cache_dir: "/REDACTED/PATHratch/REDACTED/PATHngface_cache"

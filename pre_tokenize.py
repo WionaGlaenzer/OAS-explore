@@ -17,8 +17,8 @@ if not os.path.exists(tokenized_path):
 
 text_datasets = {
     "train": [training_file],
-    "eval": [test_file],
-    "test": [val_file]
+    "eval": [val_file],
+    #"test": [val_file]
 }
 
 # Load dataset
@@ -33,6 +33,7 @@ tokenized_dataset = dataset.map(
             return_special_tokens_mask=True,
         ),
         batched=True,
+        batch_size=100,
         num_proc=12,
         remove_columns=["text"],
 )

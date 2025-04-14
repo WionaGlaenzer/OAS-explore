@@ -11,7 +11,7 @@ from transformers import (
     Trainer,
     logging as hf_logging, # Import logging submodule
 )
-from datasets import load_dataset
+from datasets import load_dataset, load_from_disk
 import datasets
 import wandb
 
@@ -89,41 +89,21 @@ except Exception as e:
 # for large datasets but simpler to implement from your original script.
 # `load_dataset` is generally safe with multiple processes accessing the cache.
 # The `.map` operation here runs independently on each process.
-if is_main_process:
-    print("Loading and Tokenizing Datasets (each process loads/tokenizes)...")
-
 try:
-    text_datasets = {
-        "train": [training_file],
-        "eval": [test_file],
-        "test": [val_file]
-    }
-    # Load dataset on all processes. Cache helps, but still redundant I/O.
-    dataset = load_dataset("text", data_files=text_datasets, cache_dir=cache_dir)
+    if is_main_process:
+        print("Loading Pre-tokenized Datasets...")
 
-    # Tokenize on all processes. This is the most redundant part.
-    # Consider pre-tokenizing or using datasets' distributed mapping features if this is a bottleneck.
-    tokenized_dataset = dataset.map(
-        lambda z: tokenizer(
-            z["text"],
-            padding="max_length",
-            truncation=True,
-            max_length=150,
-            return_special_tokens_mask=True,
-        ),
-        batched=True,
-        num_proc=1, # Set to > 1 only if doing this *outside* the parallel training script
-        remove_columns=["text"],
-    )
+    # Each process loads the already tokenized dataset
+    tokenized_dataset = load_from_disk(f"{out_dir}/tokenized")
 
     if is_main_process:
-        print("Dataset processing complete (on each process).")
+        print("Pre-tokenized dataset loaded.")
         print(f"Train dataset size: {len(tokenized_dataset['train'])}")
         print(f"Eval dataset size: {len(tokenized_dataset['eval'])}")
         print(f"Test dataset size: {len(tokenized_dataset['test'])}")
 
 except Exception as e:
-    print(f"Rank {local_rank}: Error loading or tokenizing dataset: {e}")
+    print(f"Rank {local_rank}: Error loading pre-tokenized dataset: {e}")
     sys.exit(1)
 
 
@@ -236,7 +216,7 @@ if is_main_process:
     print("Starting Training...")
 
 try:
-    trainer.train(resume_from_checkpoint="/REDACTED/PATHroject/reddy/REDACTED/PATHnal_training_testing_val_data/Soto-HIP1/model/checkpoint-142500")
+    trainer.train()
     if is_main_process:
         print("Training finished.")
 except Exception as e:
