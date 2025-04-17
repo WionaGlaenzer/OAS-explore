@@ -52,7 +52,7 @@ datasets.disable_progress_bar()
 # Set these on all processes; Trainer/Wandb usually handle reporting correctly
 os.environ["WANDB_PROJECT"] = "project_tanuki"
 os.environ["WANDB_ENTITY"] = "wiona-glaenzer-eth-z-rich"
-os.environ["WANDB_LOG_MODEL"] = "checkpoint-HIP1" # Can be 'true', 'false', or 'checkpoint'
+os.environ["WANDB_LOG_MODEL"] = "checkpoint" # Can be 'true', 'false', or 'checkpoint'
 
 # --- Print the configuration (Only Rank 0) ---
 if is_main_process:
@@ -94,7 +94,7 @@ try:
         print("Loading Pre-tokenized Datasets...")
 
     # Each process loads the already tokenized dataset
-    tokenized_dataset = load_from_disk(f"/REDACTED/PATHroject/reddy/REDACTED/PATHnal_training_testing_val_data/Soto-HIP2/tokenized")
+    tokenized_dataset = load_from_disk(f"/REDACTED/PATHroject/reddy/REDACTED/PATHnal_training_testing_val_data/Soto-All/tokenized")
 
     if is_main_process:
         print("Pre-tokenized dataset loaded.")
@@ -170,8 +170,8 @@ args = TrainingArguments(
     logging_steps=100,
     eval_strategy="steps",
     eval_steps=2500, # Match logging/save steps potentially
-    save_steps=2500,
-    save_total_limit=5, # Optional: limit number of checkpoints
+    save_steps=5000,
+    #save_total_limit=5, # Optional: limit number of checkpoints
     fp16=True, # Ensure DeepSpeed config also handles fp16/bf16 settings
     # --- Deepspeed ---
     deepspeed=deepspeed_config,
@@ -211,7 +211,6 @@ except Exception as e:
 
 
 # --- Start Training ---
-# trainer.train() handles the distributed execution
 if is_main_process:
     print("Starting Training...")
 
