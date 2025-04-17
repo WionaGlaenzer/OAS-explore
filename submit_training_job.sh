@@ -12,9 +12,9 @@ export VENV_PATH="/REDACTED/PATH"
 export CODE_BASE="/REDACTED/PATH"
 export ASSETS_DIR="${CODE_BASE}/assets"
 export TOKENIZER_PATH="${ASSETS_DIR}/antibody-tokenizer"
-export DEEPSPEED_CONFIG_PATH="${ASSETS_DIR}/deepspeed_config.json"
+export DEEPSPEED_CONFIG_PATH="${ASSETS_DIR}/deepspeed_stage2_config.json"
 export CACHE_DIR="/REDACTED/PATH"
-export MODEL_NAME="HIP1_model"
+export MODEL_NAME="Soto-All_model"
 export DONE_FILE_PATH="${MODEL_DIR}/.done"
 export TRAIN_FILE="${PROJECT_BASE}/training.txt"
 export TEST_FILE="${PROJECT_BASE}/test.txt"
@@ -74,9 +74,21 @@ if [[ -z "${WANDB_LOG_DIR}" ]]; then
   echo "Error: WANDB_LOG_DIR environment variable not set."
   exit 1
 fi
-export WANDB_DIR="${WANDB_LOG_DIR}" # W&B uses WANDB_DIR
-mkdir -p "${WANDB_DIR}" # Ensure directory exists
-echo "WANDB_DIR set to: ${WANDB_DIR}"
+export TORCH_USE_CUDA_DSA=1
+export WANDB_DIR=/REDACTED/PATHroject/reddy/REDACTED/PATHndb_logs
+# Directory for caching artifacts, etc. (use scratch space)
+export WANDB_CACHE_DIR=/REDACTED/PATHratch/REDACTED/PATHndb_cache
+# Optional: Directory for config files (use project space)
+export WANDB_CONFIG_DIR=/REDACTED/PATHroject/reddy/REDACTED/PATHnfig/wandb
+export TORCH_EXTENSIONS_DIR=/REDACTED/PATHratch/REDACTED/PATHrch_extensions
+
+
+# Make sure directories exist
+mkdir -p $WANDB_DIR
+mkdir -p $WANDB_CACHE_DIR
+mkdir -p $WANDB_CONFIG_DIR
+mkdir -p $TORCH_EXTENSIONS_DIR
+
 
 # --- Create other necessary directories ---
 # MODEL_DIR should be exported
@@ -94,12 +106,12 @@ sbatch -A es_reddy --job-name="${JOB_NAME}" \
     --cpus-per-task=6 \
     --gpus=6 \
     --gres=gpumem:6gb \
-    --mem-per-cpu=20gb \
-    --time=24:00:00 \
+    --mem-per-cpu=6gb \
+    --time=96:00:00 \
     --export=ALL \
     --wrap="python -m torch.distributed.run \
     --nproc_per_node=\$SLURM_GPUS_ON_NODE \
-    train_model.py \
+    train_after_tokenization.py \
     \"${TRAIN_FILE}\" \
     \"${TEST_FILE}\" \
     \"${VAL_FILE}\" \

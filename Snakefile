@@ -38,8 +38,8 @@ rule all:
         #f"{output_dir}/training.txt",
         #"/REDACTED/PATH"
         #f"{output_dir}/download_progress.txt",
-        #f"{output_dir}/sampled_sequences_round_robin.csv",
-        directory(f"{output_dir}/model/"),
+        f"{output_dir}/sampled_sequences_round_robin.csv",
+        #directory(f"{output_dir}/model/"),
         f"{output_dir}/sequences_per_individual/.done"
 
 rule select_files_to_download:
