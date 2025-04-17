@@ -1,4 +1,6 @@
 #!/bin/bash
+export TMPDIR=/cluster/project/reddy/wglaenzer/tmp
+mkdir -p $TMPDIR
 
 # Input parameters
 input_file="$1"
@@ -10,45 +12,59 @@ validation_fraction="$6"
 no_seqs_to_use="$7"
 temp_location="$8"
 
-# Calculate the testing fraction
-testing_fraction=$(echo "1 - $training_fraction - $validation_fraction" | bc -l)
+# Derive .csv filenames from .txt filenames
+training_csv="${training_file%.txt}.csv"
+validation_csv="${validation_file%.txt}.csv"
+testing_csv="${testing_file%.txt}.csv"
 
+# Calculate testing fraction
+testing_fraction=$(echo "1 - $training_fraction - $validation_fraction" | bc -l)
 echo "Testing fraction: $testing_fraction"
 
-# Extract the header (first line) from the input file
-header=$(head -n 1 $input_file)
+# Create temp directory if it doesn't exist
+mkdir -p "$temp_location"
 
-# Shuffle the data lines (skip the header) directly
-tail -n +2 $input_file | shuf > "$temp_location/shuffled_data.csv"
+# Extract header
+header=$(head -n 1 "$input_file")
 
-# Limit the number of sequences to use
+# Shuffle data (excluding header)
+tail -n +2 "$input_file" | shuf > "$temp_location/shuffled_data.csv"
+
+# Limit number of sequences if specified
 if [ "$no_seqs_to_use" -gt 0 ]; then
-    head -n $((no_seqs_to_use + 1)) "$temp_location/shuffled_data.csv" > "$temp_location/shuffled_data_limited.csv"
+    head -n $no_seqs_to_use "$temp_location/shuffled_data.csv" > "$temp_location/shuffled_data_limited.csv"
     mv "$temp_location/shuffled_data_limited.csv" "$temp_location/shuffled_data.csv"
 fi
 
-# Get the total number of data lines
+# Count total data lines
 total_lines=$(wc -l < "$temp_location/shuffled_data.csv")
 
-# Calculate the number of lines for training, validation, and testing
+# Calculate splits
 training_lines=$(echo "$total_lines * $training_fraction" | bc | awk '{print int($1)}')
 validation_lines=$(echo "$total_lines * $validation_fraction" | bc | awk '{print int($1)}')
-testing_lines=$(echo "$total_lines * $testing_fraction" | bc | awk '{print int($1)}')
+testing_lines=$((total_lines - training_lines - validation_lines))
 
-# Save the training, validation, and testing files with the header line
-echo "$header" > $training_file
-head -n $training_lines "$temp_location/shuffled_data.csv" >> $training_file
+# Generate training CSV
+echo "$header" > "$training_csv"
+head -n "$training_lines" "$temp_location/shuffled_data.csv" >> "$training_csv"
 
-# Get the remaining lines for validation
+# Generate validation CSV
 start_validation_line=$((training_lines + 1))
 end_validation_line=$((training_lines + validation_lines))
-echo "$header" > $validation_file
-sed -n "${start_validation_line},${end_validation_line}p" "$temp_location/shuffled_data.csv" >> "$validation_file"
+echo "$header" > "$validation_csv"
+sed -n "${start_validation_line},${end_validation_line}p" "$temp_location/shuffled_data.csv" >> "$validation_csv"
 
-# Get the remaining lines for testing
+# Generate testing CSV
 start_testing_line=$((training_lines + validation_lines + 1))
-echo "$header" > "$testing_file"
-sed -n "${start_testing_line},\$p" "$temp_location/shuffled_data.csv" >> "$testing_file"
+echo "$header" > "$testing_csv"
+sed -n "${start_testing_line},\$p" "$temp_location/shuffled_data.csv" >> "$testing_csv"
 
-# Clean up the shuffled data file
-#rm shuffled_data.csv
+# Generate .txt files with concatenated columns 4–10 (no header)
+tail -n +2 "$training_csv" | awk -F',' '{OFS=""; for(i=4;i<=10;i++) printf $i; print ""}' > "$training_file"
+tail -n +2 "$validation_csv" | awk -F',' '{OFS=""; for(i=4;i<=10;i++) printf $i; print ""}' > "$validation_file"
+tail -n +2 "$testing_csv" | awk -F',' '{OFS=""; for(i=4;i<=10;i++) printf $i; print ""}' > "$testing_file"
+
+# Done!
+echo "Generated:"
+echo "CSV files: $training_csv, $validation_csv, $testing_csv (with headers)"
+echo "TXT files: $training_file, $validation_file, $testing_file (no headers, columns 4 to 10 concatenated)"

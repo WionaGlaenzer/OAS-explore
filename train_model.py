@@ -236,7 +236,7 @@ if is_main_process:
     print("Starting Training...")
 
 try:
-    trainer.train(resume_from_checkpoint="/cluster/project/reddy/wglaenzer/final_training_testing_val_data/Soto-HIP1/model/checkpoint-142500")
+    trainer.train(resume_from_checkpoint="/cluster/project/reddy/wglaenzer/final_training_testing_val_data/Soto-HIP1/model/checkpoint-147500")
     if is_main_process:
         print("Training finished.")
 except Exception as e:
