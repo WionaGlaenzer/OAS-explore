@@ -16,6 +16,13 @@ python3.11 -m venv pipeline
 source pipeline/bin/activate
 pip install -r requirements.txt
 
+## Run the pipeline
+
+Use the command *snakemake* to run the pipeline.
+
+Required computational resources depend on the filtering choices. 
+Downloading and processing most publications from OAS takes approximately 3 days on 1 CPU with 300gb memory.
+
 ## Log in to weights and biases
 
 - Make sure you have created a *training environment* for model training
