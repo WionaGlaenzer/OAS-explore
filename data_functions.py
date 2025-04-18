@@ -9,6 +9,8 @@ import re
 import numpy as np
 import pandas as pd
 import ast
+from datasets import load_dataset, DatasetDict
+from transformers import RobertaTokenizer
 
 def select_files(filters, input_file="assets/OAS_overview.csv", output_file="outputs/data_to_download.csv"):
     """
@@ -464,3 +466,48 @@ def plot_sampling_distribution(samples_per_file, output_file):
     plot_file = os.path.join(dirname(output_file), 'sampling_distribution.png')
     plt.savefig(plot_file)
     plt.close()
+
+def tokenize(training_file, val_file, test_file, cache_dir, out_dir, tokenizer_path):
+    """
+    Tokenizes the training, validation and test sets and saves them in a given directory.
+    Uses the RobertaTokenizer from Hugging Face.
+    
+    Args:
+    - training_file: Path to the training file.
+    - val_file: Path to the validation file.
+    - test_file: Path to the test file.
+    - cache_dir: Directory to cache the datasets.
+    - out_dir: Directory to save the tokenized datasets.
+    - tokenizer_path: Path to the tokenizer model.
+    """
+    tokenizer = RobertaTokenizer.from_pretrained(tokenizer_path)
+    tokenized_path = os.path.join(out_dir, "tokenized")
+    if not os.path.exists(tokenized_path):
+        os.makedirs(tokenized_path)
+
+    text_datasets = {
+        "train": [training_file],
+        "eval": [val_file],
+        "test": [test_file]
+    }
+
+    # Load dataset
+    dataset = load_dataset("text", data_files=text_datasets, cache_dir=cache_dir)
+
+    tokenized_dataset = dataset.map(
+        lambda z: tokenizer(
+            z["text"],
+            padding="max_length",
+            truncation=True,
+            max_length=150,
+            return_special_tokens_mask=True,
+        ),
+        batched=True,
+        num_proc=12,
+        remove_columns=["text"],
+    )
+
+    # Save to disk
+    tokenized_dataset.save_to_disk(out_dir)
+    print(f"Tokenized datasets saved to: {out_dir}")
+
