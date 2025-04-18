@@ -68,7 +68,7 @@ def csv_to_fasta(input_csv, output_fasta):
 
 def filter_representative_sequences(fasta_file, input_csv, output_csv):
     """
-    Create a new CSV file containing only sequences that are in the representative FASTA file from linclust.
+    Creates a new CSV file containing only sequences that are in the representative FASTA file from linclust.
     Handles FASTA headers in format '>Sequence_225'
     """
     # Read sequence IDs from FASTA file
@@ -287,6 +287,15 @@ def get_sequences_per_publication(oas_overview, sequences):
     """
     For all sequences in the sequences CSV file, get the file ID
     and associate it with the publication it comes from using the OAS overview.
+
+    Args:
+    - oas_overview: Path to the OAS overview CSV file.
+    - sequences: Path to the sequences CSV file, contains sequence rows with File_ID.
+
+    Returns:
+    - files_per_publication: Dictionary with publication names as keys and
+      lists of file IDs corresponding to the publications as values.
+    - no_seqs_per_publication: Dictionary listing the number of sequences for each publication.
     """
     # Read the OAS overview CSV file
     oas_overview = pd.read_csv(oas_overview)
@@ -317,6 +326,12 @@ def separate_publications(sequences, files_per_publication, output_folder):
     """
     Create a file for each publication. 
     Write the sequences from the sequences CSV file that belong to that individual to the new file.
+
+    Args:
+    - sequences: Path to the sequences CSV file, contains sequence rows with File_ID.
+    - files_per_publication: Dictionary with publication names as keys and
+      lists of file IDs corresponding to the publications as values.
+    - output_folder: Directory where the separated files will be saved.
     """
     os.makedirs(output_folder, exist_ok=True)
     created_files = []  # List to store created file names
