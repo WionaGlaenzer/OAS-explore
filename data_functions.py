@@ -15,6 +15,11 @@ from transformers import RobertaTokenizer
 def select_files(filters, input_file="assets/OAS_overview.csv", output_file="outputs/data_to_download.csv"):
     """
     Filters the dataset based on the criteria given in config.yaml and writes download links to a file.
+
+    Args:
+    - filters: Dictionary containing the filtering criteria.
+    - input_file: Path to the input CSV file containing the dataset.
+    - output_file: Path to the output file where filtered download links will be saved.
     """
     
     logging.info(f"Applying filters: {filters}")
@@ -69,7 +74,14 @@ def csv_to_fasta(input_csv, output_fasta):
 def filter_representative_sequences(fasta_file, input_csv, output_csv):
     """
     Creates a new CSV file containing only sequences that are in the representative FASTA file from linclust.
+    This adds the metadata from the CSV file to the sequences in the FASTA file.
     Handles FASTA headers in format '>Sequence_225'
+
+    Args:
+    - fasta_file: Path to the FASTA file created by linclust
+      which contains the representative sequences (usually names antibody_DB_clu_rep.fasta).
+    - input_csv: Path to the input CSV file containing sequences and metadata, sequence ID from fasta should be in the first column.
+    - output_csv: Path to the output CSV file to save the filtered sequences.
     """
     # Read sequence IDs from FASTA file
     representative_ids = set()
