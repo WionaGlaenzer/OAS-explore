@@ -401,6 +401,11 @@ def round_robin_sampling(files, total_sequences, output_file):
     Samples sequences as close to evenly as possible from multiple CSV files by 
     sampling equally from files and successively excluding exhausted files.
     Also creates a bar plot showing how many sequences were sampled from each file.
+
+    Args:
+    - files: List of CSV files to sample from. Each file could for example represent data from one individual.
+    - total_sequences: Total number of sequences to sample.
+    - output_file: Path to the output file where sampled sequences are saved.
     """
 
     file_iters = {file: iter(pd.read_csv(file, chunksize=1)) for file in files}
@@ -437,7 +442,13 @@ def round_robin_sampling(files, total_sequences, output_file):
 
 
 def plot_sampling_distribution(samples_per_file, output_file):
-    """Generates and saves a bar plot of sampled sequences per file."""
+    """
+    Generates and saves a bar plot of sampled sequences per file.
+
+    Args:
+    - samples_per_file: Dictionary with filenames as keys and number of sampled sequences as values.
+    - output_file: Path to file in which the bar plot is saved.
+    """
     plt.figure(figsize=(60, 12))
 
     # Sort for better visualization
