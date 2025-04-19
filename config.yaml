@@ -188,3 +188,5 @@ validation_fraction: 0.1
 model_name: "test_model"
 
 tokenizer: "/REDACTED/PATH"
+
+deepspeed_config: "/REDACTED/PATH"
