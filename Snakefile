@@ -386,4 +386,4 @@ rule model_training_after_tokenization():
         directory = directory(f"{output_dir}/model/"),
         flag = f"{output_dir}/model/.done"  # This flag file marks completion
     shell:
-        bash submit_training_job.sh
+        bash submit_training_job_with_parameters.sh
