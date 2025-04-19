@@ -188,3 +188,5 @@ validation_fraction: 0.1
 model_name: "test_model"
 
 tokenizer: "/cluster/home/wglaenzer/Coding/plm_training_pipeline/assets/antibody-tokenizer"
+
+deepspeed_config: "/cluster/home/wglaenzer/Coding/plm_training_pipeline/assets/deepspeed_config.json"

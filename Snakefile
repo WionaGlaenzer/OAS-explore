@@ -367,3 +367,23 @@ rule tokenize():
     run:
         shell(f"mkdir -p {output.tokenized_folder}")
         shell(f"python pre_tokenize.py {input.training_txt} {input.validation_txt} {input.test_txt} {params.cache_dir} {params.tokenized_folder} {params.tokenizer}")
+
+rule model_training_after_tokenization():
+    """
+    Trains the model using pre-tokenized sequences.
+    TODO: create a submit_training_job.sh script with parameters.
+    """
+    input:
+        tokenized_dict = f"{output_dir}/tokenized/dataset_dict.json"
+        tokenized_folder = f"{output_dir}/tokenized"
+    params:
+        cache_dir = config["cache_dir"],
+        model_name = config["model_name"],
+        environment = config["training_environment"],
+        deepspeed_config = config["deepspeed_config"],
+        wandb_base_dir = config["wandb_base_dir"]
+    output:
+        directory = directory(f"{output_dir}/model/"),
+        flag = f"{output_dir}/model/.done"  # This flag file marks completion
+    shell:
+        bash submit_training_job.sh
