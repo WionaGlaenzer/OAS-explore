@@ -349,3 +349,21 @@ rule sample_by_publication_round_robin:
     run:
         shell(f"mkdir -p $(dirname {output.file})")
         round_robin_sampling(input.files, params.total_sequences, output.file)
+
+rule tokenize():
+    """
+    Tokenizes the sequences in the training, validation, and test sets using the specified tokenizer.
+    """
+    input:
+        training_txt = f"{output_dir}/training.txt",
+        validation_txt = f"{output_dir}/validation.txt",
+        test_txt = f"{output_dir}/test.txt"
+    params:
+        tokenizer = config["tokenizer"],
+        cache_dir = config["cache_dir"],
+        tokenized_folder = f"{output_dir}/tokenized"
+    output:
+        tokenized_dict = directory(f"{output_dir}/tokenized/dataset_dict.json"),
+    run:
+        shell(f"mkdir -p {output.tokenized_folder}")
+        shell(f"python pre_tokenize.py {input.training_txt} {input.validation_txt} {input.test_txt} {params.cache_dir} {params.tokenized_folder} {params.tokenizer}")
