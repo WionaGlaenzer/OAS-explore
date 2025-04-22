@@ -13,7 +13,7 @@ export TOKENIZER_PATH="${ASSETS_DIR}/antibody-tokenizer"
 export CACHE_DIR="/REDACTED/PATH"
 
 # --- Slurm Configuration ---
-JOB_NAME="train_${MODEL_NAME}"
+JOB_NAME="test_${MODEL_NAME}"
 
 # --- Environment Modules & CUDA ---
 echo "Loading modules..."
