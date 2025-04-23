@@ -12,6 +12,14 @@ from transformers import (
 import datasets
 import os
 import logging
+import argparse
+
+# Read model name from command line argument
+parser = argparse.ArgumentParser(description="Model name for evaluation")
+parser.add_argument("--model_path", type=str, required=True, help="Name of the model to evaluate")
+args = parser.parse_args()
+model_path = args.model_path
+print(f"Model name: {model_path}")
 
 # Configure logging to show info level messages
 logging.basicConfig(level=logging.INFO)
@@ -30,14 +38,16 @@ tokenizer = RobertaTokenizer.from_pretrained(tokenizer_path)
 # and should contain 'train', 'eval', and 'test' splits internally.
 # We are interested in the 'test' split here.
 pre_tokenized_dataset_locations = {
-    "test_HIP1": "/cluster/project/reddy/wglaenzer/final_training_testing_val_data/small_test_sets/small_HIP1",
-    "test_HIP2": "/cluster/project/reddy/wglaenzer/final_training_testing_val_data/small_test_sets/small_HIP2",
-    "test_HIP3": "/cluster/project/reddy/wglaenzer/final_training_testing_val_data/small_test_sets/small_HIP3",
+    #"test_HIP1": "/cluster/project/reddy/wglaenzer/final_training_testing_val_data/small_test_sets/small_HIP1",
+    #"test_HIP2": "/cluster/project/reddy/wglaenzer/final_training_testing_val_data/small_test_sets/small_HIP2",
+    #"test_HIP3": "/cluster/project/reddy/wglaenzer/final_training_testing_val_data/small_test_sets/small_HIP3",
     "test_OAS": "/cluster/project/reddy/wglaenzer/final_training_testing_val_data/small_test_sets/OAS"
 }
 
+deepspeed_config_path = "/cluster/home/wglaenzer/Coding/plm_training_pipeline/assets/deepspeed_config.json" # Path to your deepspeed config file
+
 # --- Model Loading ---
-model_path = "/cluster/project/reddy/wglaenzer/final_training_testing_val_data/OAS-wo-Soto/model/checkpoint-156250/" # Specify the path to trained model
+#model_path = "/cluster/project/reddy/wglaenzer/final_training_testing_val_data/OAS-wo-Soto/model/checkpoint-156250/" # Specify the path to trained model
 logging.info(f"Loading model: {model_path}")
 model = RobertaForMaskedLM.from_pretrained(model_path)
 model_name = model_path.split("/")[-2] # Extract model name from path
@@ -74,6 +84,7 @@ args = TrainingArguments(
     disable_tqdm=True, # Keep progress bars disabled if desired
     dataloader_num_workers=2, # Optional: speed up data loading
     remove_unused_columns=False, # Important: Keep all columns from the pre-tokenized dataset for the collator
+    deepspeed=deepspeed_config_path,
 )
 
 # --- Initialize Trainer (once) ---
