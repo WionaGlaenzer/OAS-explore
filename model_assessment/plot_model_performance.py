@@ -1,14 +1,53 @@
 # Plot performance matrix
 import seaborn as sns
 import pandas as pd
-loss_matrix = [[0.312187135219574,0.27117982506752014,0.3481293320655823,0.4170660972595215,0.477593332529068,0.34663116931915283,0.20498386025428772,0.19226765632629395,0.2168435901403427],[1.5788836479187012,0.2598249912261963,2.7727394104003906,1.6219502687454224,2.7688815593719482,0.332952618598938,1.536733627319336,0.18334434926509857,2.779560089111328],[1.4512032270431519,2.686764717102051,0.3289906680583954,1.5058821439743042,0.4584590196609497,2.6779704093933105,1.3945741653442383,2.69700026512146,0.1972951740026474],[0.80614173412323,0.8759903311729431,0.7416252493858337,0.42578673362731934,0.4877221882343292,0.35341188311576843,1.1914159059524536,1.3984917402267456,1.003313660621643],[1.5941834449768066,2.688906192779541,0.6009038686752319,1.4982008934020996,0.43506261706352234,2.688261032104492,1.6897307634353638,2.6896731853485107,0.7729799747467041],[1.819548487663269,0.8357856869697571,2.7127206325531006,1.5795741081237793,2.6999924182891846,0.3222319483757019,2.06669545173645,1.3496078252792358,2.7279608249664307],[0.7829820513725281,0.8202147483825684,0.7458194494247437,1.362550973892212,1.280888319015503,1.448056697845459,0.19177353382110596,0.18715308606624603,0.1957252472639084],[1.9098771810531616,0.7835063934326172,2.930917263031006,2.2057688236236572,2.941150665283203,1.38161301612854,1.6076009273529053,0.17844806611537933,2.9203758239746094],[1.7005358934402466,2.7860631942749023,0.7134641408920288,1.9558546543121338,1.2346173524856567,2.7585697174072266,1.4393891096115112,2.8149125576019287,0.17681056261062622]]
-names = ["Human-Mouse","Human-Mouse light","Human-Mouse heavy", "Human", "Human heavy", "Human light", "Mouse", "Mouse light", "Mouse heavy"]
+import matplotlib.pyplot as plt
+
+OAS_model_on_HIP1 = 0.475341796875
+OAS_model_on_HIP2 = 1
+OAS_model_on_HIP3 = 0.42523783445358276
+OAS_model_on_OAS = 0.3640836775302887
+OAS_model_soto = (OAS_model_on_HIP1 + OAS_model_on_HIP2 + OAS_model_on_HIP3) /3
+
+Soto_model_on_OAS = 0.47304069995880127
+Soto_model_on_HIP1 = 0.3652347922325134
+Soto_model_on_HIP2 = 0.3340586721897125
+Soto_model_on_HIP3 = 0.3303837478160858
+Soto_model_soto = (Soto_model_on_HIP1 + Soto_model_on_HIP2 + Soto_model_on_HIP3) /3
+
+HIP1_model_on_OAS = 1
+HIP1_model_on_HIP1 = 0.31787109375
+HIP1_model_on_HIP2 = 0.437744140625
+HIP1_model_on_HIP3 = 0.4296875
+HIP1_model_on_soto = (HIP1_model_on_HIP1 + HIP1_model_on_HIP2 + HIP1_model_on_HIP3) /3
+
+HIP2_model_on_OAS = 1
+HIP2_model_on_HIP1 = 0.4853515625
+HIP2_model_on_HIP2 = 1
+HIP2_model_on_HIP3 = 1
+HIP2_model_on_soto = (HIP2_model_on_HIP1 + HIP2_model_on_HIP2 + HIP2_model_on_HIP3) /3
+
+HIP3_model_on_OAS = 0.490234375
+HIP3_model_on_HIP1 = 0.492431640625
+HIP3_model_on_HIP2 = 1
+HIP3_model_on_HIP3 = 0.300537109375
+HIP3_model_on_soto = (HIP3_model_on_HIP1 + HIP3_model_on_HIP2 + HIP3_model_on_HIP3) /3
+
+
+loss_matrix = [[OAS_model_on_OAS, OAS_model_on_HIP1,1,OAS_model_on_HIP3,OAS_model_soto],
+               [HIP1_model_on_OAS, HIP1_model_on_HIP1, HIP1_model_on_HIP2, HIP1_model_on_HIP3,HIP1_model_on_soto],
+                [HIP2_model_on_OAS, HIP2_model_on_HIP1, HIP2_model_on_HIP2, HIP2_model_on_HIP3,HIP2_model_on_soto],
+                [HIP3_model_on_OAS, HIP3_model_on_HIP1, HIP3_model_on_HIP2, HIP3_model_on_HIP3,HIP3_model_on_soto],
+               [Soto_model_on_OAS,Soto_model_on_HIP1,Soto_model_on_HIP2,Soto_model_on_HIP3,Soto_model_soto]]
+
+names = ["OAS-wo-Soto","HIP-1","HIP-2", "HIP-3", "Soto-All"]
 plt.figure(figsize=(10, 8))
 loss_df = pd.DataFrame(loss_matrix, index=names, columns=names)
-new_order = ["Human-Mouse", "Human", "Mouse", "Human-Mouse heavy","Human heavy","Mouse heavy", "Human-Mouse light", "Human light", "Mouse light"]
-loss_df = loss_df.reindex(index=new_order, columns=new_order)
-sns.heatmap(loss_df, annot=True, cmap="viridis_r", cbar_kws={'label': 'Loss'}, xticklabels=new_order, yticklabels=new_order)
+sns.heatmap(loss_df, annot=True, cmap="viridis_r", cbar_kws={'label': 'Loss'}, xticklabels=names, yticklabels=names)
 plt.title("Model performance on different test sets")
 plt.xlabel("Test data")
 plt.ylabel("Training data")
 plt.savefig("loss_different_test_sets.pdf")
+
+
+
