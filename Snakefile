@@ -387,3 +387,31 @@ rule model_training_after_tokenization():
         flag = f"{output_dir}/model/.done"  # This flag file marks completion
     shell:
         bash submit_training_job_with_parameters.sh
+
+rule model_testing:
+    input:
+        test = f"{output_dir}/test.txt"
+    params:
+        n_splits = config["n_splits"],
+        testing_environment = config["testing_environment"],
+        tokenizer = config["tokenizer"],
+        cache_dir = config["cache_dir"],
+        model_name = config["model_name"],
+        deepspeed_config = config["deepspeed_config"],
+    output:
+        performance = f"{output_dir}/performance.csv",
+        performance_plot = f"{output_dir}/performance_plot.pdf"  # This flag file marks completion
+    shell:
+        '''
+        source {params.testing_environment}/bin/activate
+        
+        RPORT=$((RANDOM % 55535 + 10000))
+        
+        bash submit_and_wait.sh "
+        echo 'CUDA_HOME is set to: $CUDA_HOME'
+        echo \\"Using rendezvous port: $RPORT\\"
+        export WANDB_DIR='{params.wandb_base_dir}';
+        torchrun --nproc_per_node=auto --rdzv-backend=c10d --rdzv-endpoint=\\"localhost:$RPORT\\" \
+        test_model.py {input.test} {params.cache_dir} \
+        {output.directory} {params.model_name} {output.flag} {params.tokenizer} {params.deepspeed_config}"
+        '''
