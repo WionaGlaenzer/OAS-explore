@@ -15,10 +15,10 @@ wandb_base_dir: "/REDACTED/PATHroject/reddy/REDACTED/PATHnal_training_testing_va
 
 # Filtering criteria
 filtering:
-  max_sequences: 100000       # Limit dataset to 100,000 sequences
-  min_length: 50              # Minimum sequence length
-  max_length: 1000            # Maximum sequence length
-  filter_by_region_length: true  # Filter sequences by region length
+  #max_sequences: 100000       # Limit dataset to 100,000 sequences (not implemented yet)
+  #min_length: 50              # Minimum sequence length (not implemented yet)
+  #max_length: 1000            # Maximum sequence length (not implemented yet)
+  filter_by_region_length: true  # TODO: Filter sequences by region length
 
 linclust:
   coverage: 0.9
@@ -190,3 +190,8 @@ model_name: "test_model"
 tokenizer: "/REDACTED/PATHnzer/Coding/plm_training_pipeline/assets/antibody-tokenizer"
 
 deepspeed_config: "/REDACTED/PATHnzer/Coding/plm_training_pipeline/assets/deepspeed_config.json"
+
+###### Test settings #####
+
+n_splits: 5
+testing_environment: "/REDACTED/PATHroject/reddy/REDACTED/PATHnvironments/model-testing"
