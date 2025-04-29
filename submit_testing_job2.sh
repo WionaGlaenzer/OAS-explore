@@ -111,7 +111,7 @@ sbatch -A es_reddy --job-name="${JOB_NAME}" \
     --export=ALL \
     --wrap="python -m torch.distributed.run \
     --nproc_per_node=\$SLURM_GPUS_ON_NODE \
-    model_assessment/inference_comparison_test.py --model_path \"/cluster/project/reddy/wglaenzer/final_training_testing_val_data/Soto-HIP2/model/checkpoint-156250\""
+    model_assessment/inference_comparison_test.py --model_path \"/cluster/project/reddy/wglaenzer/final_training_testing_val_data/OAS-wo-Soto/model/checkpoint-156250\""
 
 # Check if sbatch command succeeded
 if [ $? -eq 0 ]; then

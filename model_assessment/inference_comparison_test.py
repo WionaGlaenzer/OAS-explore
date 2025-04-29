@@ -39,9 +39,9 @@ tokenizer = RobertaTokenizer.from_pretrained(tokenizer_path)
 # We are interested in the 'test' split here.
 pre_tokenized_dataset_locations = {
     #"test_HIP1": "/cluster/project/reddy/wglaenzer/final_training_testing_val_data/small_test_sets/small_HIP1",
-    #"test_HIP2": "/cluster/project/reddy/wglaenzer/final_training_testing_val_data/small_test_sets/small_HIP2",
+    "test_HIP2": "/cluster/project/reddy/wglaenzer/final_training_testing_val_data/small_test_sets/small_HIP2",
     #"test_HIP3": "/cluster/project/reddy/wglaenzer/final_training_testing_val_data/small_test_sets/small_HIP3",
-    "test_OAS": "/cluster/project/reddy/wglaenzer/final_training_testing_val_data/small_test_sets/OAS"
+    #"test_OAS": "/cluster/project/reddy/wglaenzer/final_training_testing_val_data/small_test_sets/OAS"
 }
 
 deepspeed_config_path = "/cluster/home/wglaenzer/Coding/plm_training_pipeline/assets/deepspeed_config.json" # Path to your deepspeed config file
