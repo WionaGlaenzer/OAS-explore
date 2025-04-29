@@ -25,22 +25,22 @@ logging.basicConfig(
 
 rule all:
     input:
-        #f"{output_dir}/sequences.csv",
+        f"{output_dir}/sequences.csv",
         #f"{output_dir}/data_to_download.csv",
-        f"{output_dir}/sequences.fasta",
-        f"{linclust_dir}/antibody_DB_clu_rep.fasta",
-        f"{output_dir}/sequences_filtered.csv",
-        f"{output_dir}/sequences_filtered_processed.csv",
-        f"{output_dir}/number_of_seqs_per_individual.csv",
+        #f"{output_dir}/sequences.fasta",
+        #f"{linclust_dir}/antibody_DB_clu_rep.fasta",
+        #f"{output_dir}/sequences_filtered.csv",
+        #f"{output_dir}/sequences_filtered_processed.csv",
+        #f"{output_dir}/number_of_seqs_per_individual.csv",
         #f"{output_dir}/sampled_sequences.csv",
         #f"{output_dir}/test_set.csv",
         #f"{output_dir}/training_set.csv",
         #f"{output_dir}/training.txt",
         #"/REDACTED/PATH"
         #f"{output_dir}/download_progress.txt",
-        f"{output_dir}/sampled_sequences_round_robin.csv",
+        #f"{output_dir}/sampled_sequences_round_robin.csv",
         #directory(f"{output_dir}/model/"),
-        f"{output_dir}/sequences_per_individual/.done"
+        #f"{output_dir}/sequences_per_individual/.done"
 
 rule select_files_to_download:
     """
@@ -67,7 +67,8 @@ rule download_data:
     params:
         columns_to_keep = config["columns_to_keep"],
         download_dir = config["download_dir"],
-        n_lines = config["n_lines"]
+        n_lines = config["n_lines"],
+        do_length_filtering = config["filtering"]["filter_by_region_length"]
     run:
         # Read the header file to get column positions
         header_df = pd.read_csv(input.header)
@@ -76,7 +77,12 @@ rule download_data:
         # Join the column numbers with commas
         col_numbers = ",".join(col_positions)
         # Run the shell command to download and process the data
-        shell("bash download.sh {input.data_list} {output} {params.n_lines} {col_numbers} {params.download_dir}")
+        if params.do_length_filtering:
+            logging.info("Length filtering is enabled. Downloading sequences with length filtering.")
+            shell("bash download.sh {input.data_list} {output} {params.n_lines} {col_numbers} {params.download_dir}")
+        else:
+            logging.info("Length filtering is disabled. Downloading all sequences.")
+            shell("bash download_no_length_filter.sh {input.data_list} {output} {params.n_lines} {col_numbers} {params.download_dir}")
         #shell("""
         # Check if the output file contains more than just the header
         #line_count=$(cat {output} | wc -l)
@@ -350,7 +356,7 @@ rule sample_by_publication_round_robin:
         shell(f"mkdir -p $(dirname {output.file})")
         round_robin_sampling(input.files, params.total_sequences, output.file)
 
-rule tokenize():
+rule tokenize:
     """
     Tokenizes the sequences in the training, validation, and test sets using the specified tokenizer.
     """
@@ -368,13 +374,13 @@ rule tokenize():
         shell(f"mkdir -p {output.tokenized_folder}")
         shell(f"python pre_tokenize.py {input.training_txt} {input.validation_txt} {input.test_txt} {params.cache_dir} {params.tokenized_folder} {params.tokenizer}")
 
-rule model_training_after_tokenization():
+rule model_training_after_tokenization:
     """
     Trains the model using pre-tokenized sequences.
     TODO: create a submit_training_job.sh script with parameters.
     """
     input:
-        tokenized_dict = f"{output_dir}/tokenized/dataset_dict.json"
+        tokenized_dict = f"{output_dir}/tokenized/dataset_dict.json",
         tokenized_folder = f"{output_dir}/tokenized"
     params:
         cache_dir = config["cache_dir"],
@@ -386,7 +392,9 @@ rule model_training_after_tokenization():
         directory = directory(f"{output_dir}/model/"),
         flag = f"{output_dir}/model/.done"  # This flag file marks completion
     shell:
+        '''
         bash submit_training_job_with_parameters.sh
+        '''
 
 rule model_testing:
     input:
