@@ -18,7 +18,7 @@ filtering:
   #max_sequences: 100000       # Limit dataset to 100,000 sequences (not implemented yet)
   #min_length: 50              # Minimum sequence length (not implemented yet)
   #max_length: 1000            # Maximum sequence length (not implemented yet)
-  filter_by_region_length: true  # TODO: Filter sequences by region length
+  filter_by_region_length: true  # TODO: Allow to turn off filtering sequences by region length
 
 linclust:
   coverage: 0.9
