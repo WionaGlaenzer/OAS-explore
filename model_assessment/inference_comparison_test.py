@@ -39,9 +39,9 @@ tokenizer = RobertaTokenizer.from_pretrained(tokenizer_path)
 # We are interested in the 'test' split here.
 pre_tokenized_dataset_locations = {
     #"test_HIP1": "/REDACTED/PATH",
-    #"test_HIP2": "/REDACTED/PATH",
+    "test_HIP2": "/REDACTED/PATH",
     #"test_HIP3": "/REDACTED/PATH",
-    "test_OAS": "/REDACTED/PATH"
+    #"test_OAS": "/REDACTED/PATH"
 }
 
 deepspeed_config_path = "/REDACTED/PATH" # Path to your deepspeed config file
