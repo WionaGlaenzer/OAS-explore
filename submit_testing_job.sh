@@ -15,6 +15,9 @@ export CACHE_DIR="/cluster/scratch/wglaenzer/huggingface_cache"
 # --- Slurm Configuration ---
 JOB_NAME="test_${MODEL_NAME}"
 
+# --- Model Configuration ---
+MODEL_PATH="/cluster/project/reddy/wglaenzer/final_training_testing_val_data/Soto-HIP1/model/checkpoint-156250"
+
 # --- Environment Modules & CUDA ---
 echo "Loading modules..."
 # Deactivate any potentially active virtualenv from submission node before loading modules/activating new one
@@ -56,7 +59,7 @@ fi
 echo "Activating Python venv: ${VENV_PATH}"
 source "${VENV_PATH}"
 
-export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+#export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 
 # --- Submit Job ---
 # Use --export=ALL to pass the current environment (including variables defined above with export)
@@ -65,11 +68,11 @@ sbatch -A es_reddy --job-name="${JOB_NAME}" \
     -n 1 \
     --cpus-per-task=1 \
     --gpus=1 \
-    --gres=gpumem:50gb \
-    --mem-per-cpu=100gb \
-    --time=12:00:00 \
+    --gres=gpumem:10gb \
+    --mem-per-cpu=10gb \
+    --time=1:00:00 \
     --export=ALL \
-    --wrap="python model_assessment/inference_comparison_test.py"
+    --wrap="python model_assessment/inference_comparison_test.py --model_path $MODEL_PATH"
 
 # Check if sbatch command succeeded
 if [ $? -eq 0 ]; then
