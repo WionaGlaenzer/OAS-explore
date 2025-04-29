@@ -5,7 +5,7 @@
 # Using export makes these variables available to the sbatch command's environment,
 # and Slurm can then pass them to the job script environment.
 #export PROJECT_BASE="/REDACTED/PATHroject/reddy/REDACTED/PATHnal_training_testing_val_data/Soto-HIP1"
-export PROJECT_BASE="/REDACTED/PATHroject/reddy/REDACTED/PATHnal_training_testing_val_data/Soto-All"
+export PROJECT_BASE="/REDACTED/PATHroject/reddy/REDACTED/PATHnal_training_testing_val_data/OAS-wo-Soto"
 export MODEL_DIR="${PROJECT_BASE}/model"
 export WANDB_LOG_DIR="${MODEL_DIR}/wandb_logs" # W&B log directory
 export VENV_PATH="/REDACTED/PATHroject/reddy/REDACTED/PATHnvironments/training/bin/activate"
@@ -14,7 +14,7 @@ export ASSETS_DIR="${CODE_BASE}/assets"
 export TOKENIZER_PATH="${ASSETS_DIR}/antibody-tokenizer"
 export DEEPSPEED_CONFIG_PATH="${ASSETS_DIR}/deepspeed_stage2_config.json"
 export CACHE_DIR="/REDACTED/PATHratch/REDACTED/PATHngface_cache"
-export MODEL_NAME="Soto-All_model"
+export MODEL_NAME="OAS_model"
 export DONE_FILE_PATH="${MODEL_DIR}/.done"
 export TRAIN_FILE="${PROJECT_BASE}/training.txt"
 export TEST_FILE="${PROJECT_BASE}/test.txt"
@@ -107,7 +107,7 @@ sbatch -A es_reddy --job-name="${JOB_NAME}" \
     --gpus=6 \
     --gres=gpumem:6gb \
     --mem-per-cpu=6gb \
-    --time=96:00:00 \
+    --time=120:00:00 \
     --export=ALL \
     --wrap="python -m torch.distributed.run \
     --nproc_per_node=\$SLURM_GPUS_ON_NODE \
