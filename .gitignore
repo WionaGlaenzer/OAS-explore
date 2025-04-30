@@ -5,3 +5,6 @@ downloading/
 outputs/
 linclust/
 slurm*
+results/
+wandb/
+mmseqs/
