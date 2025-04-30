@@ -13,7 +13,7 @@ def calculate_v_call_stats(csv_path):
         dask.dataframe.Series: A Dask Series containing the counts of each V-gene family.
     """
     # Read the CSV file using Dask
-    ddf = dd.read_csv(csv_path, dtype={'d_call': 'object', 'j_call': 'object'})
+    ddf = dd.read_csv(csv_path, dtype={'v_call': 'object', 'd_call': 'object', 'j_call': 'object'})
 
     # Process the 'v_call' column
     # 1. Extract the part of the string before the first occurrence of '-', '*', or 'S' using regex
