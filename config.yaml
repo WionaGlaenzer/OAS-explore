@@ -1,8 +1,8 @@
 ###### File paths #####
 
-download_dir: "/REDACTED/PATHroject/reddy/REDACTED/PATHne_revisions/mouse/download"
-output_dir: "/REDACTED/PATHroject/reddy/REDACTED/PATHne_revisions/mouse/output"
-linclust_dir: "/REDACTED/PATHroject/reddy/REDACTED/PATHne_revisions/mouse/linclust"
+download_dir: "/REDACTED/PATHroject/reddy/REDACTED/PATHne_revisions/human/download"
+output_dir: "/REDACTED/PATHroject/reddy/REDACTED/PATHne_revisions/human/output"
+linclust_dir: "/REDACTED/PATHroject/reddy/REDACTED/PATHne_revisions/human/linclust"
 
 #output_dir: "/REDACTED/PATHroject/reddy/REDACTED/PATHn/OAS_wo_Soto/output"
 #download_dir: "/REDACTED/PATHroject/reddy/REDACTED/PATHn/OAS_wo_Soto/download"
@@ -28,13 +28,14 @@ linclust:
 filters:
   Species:
     #- "rabbit"
-    - "mouse_C57BL/6"
-    - "mouse_BALB/c"
-    - "mouse"
-    - "Kymouse"
-    - "HIS-Mouse"
-    - "mouse_RAG2-GFP/129Sve"
-    - "mouse_Swiss-Webster"
+    #- "mouse_C57BL/6"
+    #- "mouse_BALB/c"
+    #- "mouse"
+    #- "Kymouse"
+    #- "HIS-Mouse"
+    #- "mouse_RAG2-GFP/129Sve"
+    #- "mouse_Swiss-Webster"
+    - "human"
 
 
   #Author: # Use the publication name as it appears on OAS
