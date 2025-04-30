@@ -1,3 +1,14 @@
+##### Steps to run #####
+
+pipeline_stages:
+  - download
+  - clustering
+  - selection
+  - sampling
+  - splitting
+  - tokenization
+  - training
+
 ###### File paths #####
 
 download_dir: "/REDACTED/PATH"
