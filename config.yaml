@@ -1,8 +1,19 @@
+##### Steps to run #####
+
+pipeline_stages:
+  - download
+  - clustering
+  - selection
+  - sampling
+  - splitting
+  - tokenization
+  - training
+
 ###### File paths #####
 
-download_dir: "/cluster/project/reddy/wglaenzer/daphne_revisions/mouse/download"
-output_dir: "/cluster/project/reddy/wglaenzer/daphne_revisions/mouse/output"
-linclust_dir: "/cluster/project/reddy/wglaenzer/daphne_revisions/mouse/linclust"
+download_dir: "/cluster/project/reddy/wglaenzer/daphne_revisions/human/download"
+output_dir: "/cluster/project/reddy/wglaenzer/daphne_revisions/human/output"
+linclust_dir: "/cluster/project/reddy/wglaenzer/daphne_revisions/human/linclust"
 
 #output_dir: "/cluster/project/reddy/wglaenzer/OAS_by_publication/OAS_wo_Soto/output"
 #download_dir: "/cluster/project/reddy/wglaenzer/OAS_by_publication/OAS_wo_Soto/download"
@@ -28,13 +39,14 @@ linclust:
 filters:
   Species:
     #- "rabbit"
-    - "mouse_C57BL/6"
-    - "mouse_BALB/c"
-    - "mouse"
-    - "Kymouse"
-    - "HIS-Mouse"
-    - "mouse_RAG2-GFP/129Sve"
-    - "mouse_Swiss-Webster"
+    #- "mouse_C57BL/6"
+    #- "mouse_BALB/c"
+    #- "mouse"
+    #- "Kymouse"
+    #- "HIS-Mouse"
+    #- "mouse_RAG2-GFP/129Sve"
+    #- "mouse_Swiss-Webster"
+    - "human"
 
 
   #Author: # Use the publication name as it appears on OAS
