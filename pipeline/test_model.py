@@ -13,7 +13,7 @@ import datasets
 import os
 import logging
 import argparse
-from testing_functions import get_CV_splits
+from pipeline.testing_functions import get_CV_splits
 
 # Read model name from command line argument
 parser = argparse.ArgumentParser(description="Model name for evaluation")
