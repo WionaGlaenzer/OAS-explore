@@ -1,3 +1,14 @@
+##### Steps to run #####
+
+pipeline_stages:
+  - download
+  - clustering
+  - selection
+  - sampling
+  - splitting
+  - tokenization
+  - training
+
 ###### File paths #####
 
 download_dir: "/REDACTED/PATH"
@@ -28,13 +39,14 @@ linclust:
 filters:
   Species:
     #- "rabbit"
-    - "mouse_C57BL/6"
-    - "mouse_BALB/c"
-    - "mouse"
-    - "Kymouse"
-    - "HIS-Mouse"
-    - "mouse_RAG2-GFP/129Sve"
-    - "mouse_Swiss-Webster"
+    #- "mouse_C57BL/6"
+    #- "mouse_BALB/c"
+    #- "mouse"
+    #- "Kymouse"
+    #- "HIS-Mouse"
+    #- "mouse_RAG2-GFP/129Sve"
+    #- "mouse_Swiss-Webster"
+    - "human"
 
 
   #Author: # Use the publication name as it appears on OAS
