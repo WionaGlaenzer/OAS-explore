@@ -1,7 +1,7 @@
 configfile: "config.yaml"
 
 import pandas as pd
-from data_functions import (select_files, csv_to_fasta, filter_representative_sequences, 
+from pipeline.data_functions import (select_files, csv_to_fasta, filter_representative_sequences, 
                           process_anarci_column, get_sequences_per_individual, separate_individuals,
                           get_sequences_per_publication, separate_publications, number_of_seqs_overview,
                           csv_to_txt, round_robin_sampling)
@@ -23,6 +23,56 @@ logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s",
 )
 
+# Mapping from user-friendly stage names to target files/directories
+STAGE_TO_TARGETS = {
+    "download": [f"{output_dir}/sequences.csv"],
+    "clustering": [f"{linclust_dir}/antibody_DB_clu_rep.fasta"],
+    "selection": [f"{output_dir}/sequences_filtered_processed.csv"],
+    "sampling": [f"{output_dir}/sampled_sequences.csv"],
+    "splitting": [
+        f"{output_dir}/training_set.csv",
+        f"{output_dir}/validation_set.csv",
+        f"{output_dir}/test_set.csv",
+        f"{output_dir}/training.txt",
+        f"{output_dir}/validation.txt",
+        f"{output_dir}/test.txt"
+    ],
+    "tokenization": [
+        directory(f"{output_dir}/tokenized") # Target the directory itself
+    ],
+    "training": [
+        directory(f"{output_dir}/model"), # Target the directory
+        f"{output_dir}/model/.done"      # And/or the flag file
+    ],
+}
+
+# Function to generate target file paths based on config.yaml stages
+def get_final_targets(wildcards):
+    targets = []
+    if "pipeline_stages" not in config or not config["pipeline_stages"]:
+        raise ValueError("Config file 'config.yaml' must contain a non-empty list under the key 'pipeline_stages' specifying the desired pipeline stages.")
+
+    requested_stages = config["pipeline_stages"]
+    logging.info(f"Pipeline stages requested in config: {requested_stages}")
+
+    for stage_name in requested_stages:
+        if stage_name in STAGE_TO_TARGETS:
+            stage_targets = STAGE_TO_TARGETS[stage_name]
+            targets.extend(stage_targets) # Directly extend with targets from the map
+            logging.info(f"Added targets for stage '{stage_name}': {stage_targets}")
+        else:
+            logging.warning(f"Stage '{stage_name}' defined in config.yaml is not recognized. Skipping.")
+            # Alternatively, raise an error:
+            # raise ValueError(f"Stage '{stage_name}' defined in config.yaml is not recognized. Available stages: {list(STAGE_TO_TARGETS.keys())}")
+
+    if not targets:
+         raise ValueError("No valid target files could be determined from the requested pipeline stages in config.yaml.")
+
+    # Remove duplicates if stages overlap in targets
+    unique_targets = list(dict.fromkeys(targets))
+    logging.info(f"Pipeline will generate the following unique targets based on config stages: {unique_targets}")
+    return unique_targets
+
 rule all:
     input:
         f"{output_dir}/sequences.csv",
@@ -41,6 +91,7 @@ rule all:
         #f"{output_dir}/sampled_sequences_round_robin.csv",
         #directory(f"{output_dir}/model/"),
         #f"{output_dir}/sequences_per_individual/.done"
+        get_final_targets(wildcards)
 
 rule select_files_to_download:
     """
@@ -79,7 +130,7 @@ rule download_data:
         # Run the shell command to download and process the data
         if params.do_length_filtering:
             logging.info("Length filtering is enabled. Downloading sequences with length filtering.")
-            shell("bash download.sh {input.data_list} {output} {params.n_lines} {col_numbers} {params.download_dir}")
+            shell("bash pipeline/download.sh {input.data_list} {output} {params.n_lines} {col_numbers} {params.download_dir}")
         else:
             logging.info("Length filtering is disabled. Downloading all sequences.")
             shell("bash download_no_length_filter.sh {input.data_list} {output} {params.n_lines} {col_numbers} {params.download_dir}")
@@ -118,7 +169,7 @@ rule linclust:
         similarity = config["linclust"]["similarity"],
         coverage = config["linclust"]["coverage"]
     run:
-        shell("bash linclust.sh {linclust_dir} {input.sequences_fasta} {params.similarity} {params.coverage}")
+        shell("bash pipeline/linclust.sh {linclust_dir} {input.sequences_fasta} {params.similarity} {params.coverage}")
 
 rule select_filtered_sequences_in_csv:
     """
@@ -164,7 +215,7 @@ rule sample_sequences:
         total_sequences = config["total_sequences"]
     run:
         if params.sampling_scheme == "random":
-            shell("bash sample_sequences.sh {input.sequences_csv} {output} {params.total_sequences}")
+            shell("bash pipeline/sample_sequences.sh {input.sequences_csv} {output} {params.total_sequences}")
         elif params.sampling_scheme == "balance_individuals":
             # Combine the individual samples into final output
             shell(f"head -n 1 $(ls {output_dir}/sampled_sequences_by_individual/*.csv | head -n 1) > {output}")
@@ -289,7 +340,7 @@ rule split_data:
         training_fraction = config["training_fraction"],
         validation_fraction = config["validation_fraction"]
     run:
-        shell(f"bash split_data.sh {input.sequences_csv} {output.training} {output.validation} {output.test} {params.training_fraction} {params.validation_fraction} 0 {output_dir}")
+        shell(f"bash pipeline/split_data.sh {input.sequences_csv} {output.training} {output.validation} {output.test} {params.training_fraction} {params.validation_fraction} 0 {output_dir}")
 
 rule csv_to_txt:
     """
@@ -331,12 +382,12 @@ rule model_training:
 
         RPORT=$((RANDOM % 55535 + 10000))
         
-        bash submit_and_wait.sh "
+        bash pipeline/submit_and_wait.sh "
         echo 'CUDA_HOME is set to: $CUDA_HOME'
         echo \\"Using rendezvous port: $RPORT\\"
         export WANDB_DIR='{params.wandb_base_dir}';
         torchrun --nproc_per_node=auto --rdzv-backend=c10d --rdzv-endpoint=\\"localhost:$RPORT\\" \
-        train_model.py {input.training} {input.validation} {input.test} {params.cache_dir} \
+        pipeline/train_model.py {input.training} {input.validation} {input.test} {params.cache_dir} \
         {output.directory} {params.model_name} {output.flag} {params.tokenizer} {params.deepspeed_config}"
         '''
 
@@ -372,7 +423,7 @@ rule tokenize:
         tokenized_dict = directory(f"{output_dir}/tokenized/dataset_dict.json"),
     run:
         shell(f"mkdir -p {output.tokenized_folder}")
-        shell(f"python pre_tokenize.py {input.training_txt} {input.validation_txt} {input.test_txt} {params.cache_dir} {params.tokenized_folder} {params.tokenizer}")
+        shell(f"python pipeline/pre_tokenize.py {input.training_txt} {input.validation_txt} {input.test_txt} {params.cache_dir} {params.tokenized_folder} {params.tokenizer}")
 
 rule model_training_after_tokenization:
     """
@@ -393,7 +444,7 @@ rule model_training_after_tokenization:
         flag = f"{output_dir}/model/.done"  # This flag file marks completion
     shell:
         '''
-        bash submit_training_job_with_parameters.sh
+        bash pipeline/submit_training_job_with_parameters.sh
         '''
 
 rule model_testing:
