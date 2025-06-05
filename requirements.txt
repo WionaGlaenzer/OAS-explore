@@ -2,3 +2,4 @@ csvkit
 snakemake
 pandas
 matplotlib
+dask
