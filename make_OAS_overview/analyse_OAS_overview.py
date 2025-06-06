@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from oas_analysis_utils import (
     load_oas_overview,
     plot_grouped_data,
+    plot_grouped_data_two_bars,
     plot_filtered_labels,
 )
 
@@ -73,6 +74,15 @@ plot_grouped_data(ddf, ["Author"], "Unique_sequences", "Unique sequences", "Publ
 plot_grouped_data(ddf, ["Subject", "Author"], "Unique_sequences", "Unique sequences", "Publication", "Unique Sequences by Subject and Publication", PLOT_DIR / "unique_sequences_by_subject_log.pdf", log_scale=True)
 plot_grouped_data(ddf, ["Subject", "Author"], "Unique_sequences", "Unique sequences", "Publication", "Unique Sequences by Subject and Publication", PLOT_DIR / "unique_sequences_by_subject.pdf")
 plot_grouped_data(ddf, ["Species", "Chain"], "Unique_sequences", "Unique sequences", "Species and Chain" ,"Unique Sequences by Species and Chain", PLOT_DIR / "unique_sequences_by_species_chain.pdf")
+plot_grouped_data_two_bars(
+    ddf,
+    ["Species", "Chain"],
+    "Unique_sequences",
+    "Unique sequences",
+    "Species",
+    "Unique Sequences by Species and Chain (Grouped)",
+    PLOT_DIR / "unique_sequences_by_species_chain_grouped.pdf",
+)
 
 
 # Histogram for subjects vs unique sequences per individual
