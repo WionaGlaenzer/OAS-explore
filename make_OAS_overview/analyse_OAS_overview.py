@@ -1,262 +1,126 @@
+import dask.dataframe as dd
+from pathlib import Path
 import pandas as pd
 import matplotlib.pyplot as plt
 
-# Specify the input CSV file name
-input_file = "../assets/OAS_overview.csv"  # Replace with your actual CSV file
+from oas_analysis_utils import (
+    load_oas_overview,
+    plot_grouped_data,
+    plot_filtered_labels,
+)
 
-# Read the CSV file into a pandas DataFrame
-print("starting to read in")
-df = pd.read_csv(input_file, sep=",")
-print("read in the file")
 
-# Make a histogram with the number of sequences per age
-# Drop rows where "Age" or "Unique_sequences" contain "no" or NaN
-df_clean = df[(df["Age"] != "no") & (df["Unique_sequences"] != "no")].dropna(subset=["Age", "Unique_sequences"])
+INPUT_FILE = Path("../assets/OAS_overview.csv")
+PLOT_DIR = Path("plots")
+PLOT_DIR.mkdir(exist_ok=True)
 
-# Convert columns to numeric
-df_clean["Age"] = pd.to_numeric(df_clean["Age"], errors="coerce")
-df_clean["Unique_sequences"] = pd.to_numeric(df_clean["Unique_sequences"], errors="coerce")
 
-# Drop any remaining NaN values after conversion
-df_clean = df_clean.dropna(subset=["Age", "Unique_sequences"])
+# Load and clean the overview data with Dask
+print("Reading overview CSV...")
+ddf = load_oas_overview(INPUT_FILE)
+print("File read complete")
 
-# Create a weighted histogram
+df = ddf.compute()
+
+# Weighted histogram of sequences per age
 plt.figure(figsize=(10, 6))
-plt.hist(df_clean["Age"], bins=20, weights=df_clean["Unique_sequences"], edgecolor="black", alpha=0.7)
-
-# Labels and title
+plt.hist(
+    df["Age"],
+    bins=20,
+    weights=df["Unique_sequences"],
+    edgecolor="black",
+    alpha=0.7,
+)
 plt.xlabel("Age")
 plt.ylabel("Number of Unique Sequences")
 plt.title("Histogram of Unique Sequences per Age")
 plt.grid(axis="y", linestyle="--", alpha=0.7)
+plt.savefig(PLOT_DIR / "sequences_per_age.pdf", format="pdf")
+print("Histogram saved as sequences_per_age.pdf")
 
-# Save the plot as a PDF
-plt.savefig("sequences_per_age.pdf", format="pdf")
-print(f"Histogram saved as sequences_per_age.pdf")
+# Publications with subject "no"
+print(ddf[ddf["Subject"] == "no"]["Author"].unique().compute())
 
-
-# Print the names of all publications that have files with individual "no"
-print(df[df["Subject"] == "no"]["Author"].unique())
-
-# Get all individuals names that are present in several publications and all publications they are present in
-individual_counts = df.groupby("Subject")["Author"].nunique()
+# Individuals present in multiple publications
+individual_counts = ddf.groupby("Subject")["Author"].nunique().compute()
 multiple_publications = individual_counts[individual_counts > 1].index
-
-# Get all publications for each of these individuals
 for individual in multiple_publications:
     publications = df[df["Subject"] == individual]["Author"].unique()
     print(f"Individual: {individual}, Publications: {list(publications)}")
 
-# Print all unique publication titles
-unique_publications = df["Author"].unique()
-print(f"Unique publications: {unique_publications}")
+# Unique publications
+unique_publications = ddf["Author"].unique().compute()
+print(f"Unique publications: {list(unique_publications)}")
 
-# Sum the "size_MB" column (make sure it's numeric)
-total_size = df["Size_MB"].sum()
-
-# Print the total size
+# Total size calculations
+size_series = dd.to_numeric(ddf["Size_MB"], errors="coerce").fillna(0)
+total_size = size_series.sum().compute()
 print(f"Total size in MB: {total_size}")
+print(f"Total size in GB: {total_size / 1024}")
+print(f"Total size in TB: {total_size / 1024 / 1024}")
 
-# Covert to GB and print
-total_size_gb = total_size / 1024
-print(f"Total size in GB: {total_size_gb}")
-
-# Convert to TB and print
-total_size_tb = total_size_gb / 1024
-print(f"Total size in TB: {total_size_tb}")
-
-grouped_data = df.groupby(["Author"])["Unique_sequences"].sum()
-
+# Grouped data per author
+grouped_data = ddf.groupby("Author")["Unique_sequences"].sum().compute()
 print(grouped_data)
+(grouped_data).to_csv("grouped_data.csv")
 
-# save group by as a csv file
-grouped_data.to_csv("grouped_data.csv")
+# Plotting
+plot_grouped_data(ddf, ["Author"], "Size_MB", "Total Size (MB)", "Total Size by Publication", PLOT_DIR / "total_size_by_publication.pdf")
+plot_grouped_data(ddf, ["Author"], "Total_sequences", "Total sequences", "Total sequences by Publication", PLOT_DIR / "total_sequences_by_publication.pdf")
+plot_grouped_data(ddf, ["Author"], "Unique_sequences", "Unique sequences", "Unique sequences by Publication", PLOT_DIR / "unique_sequences_by_publication.pdf")
+plot_grouped_data(ddf, ["Subject", "Author"], "Unique_sequences", "Unique sequences", "Unique Sequences by Subject and Publication", PLOT_DIR / "unique_sequences_by_subject_log.pdf", log_scale=True)
+plot_grouped_data(ddf, ["Subject", "Author"], "Unique_sequences", "Unique sequences", "Unique Sequences by Subject and Publication", PLOT_DIR / "unique_sequences_by_subject.pdf")
 
-def plot_grouped_data(df, group_columns, sum_column, y_label, title, file_name, log_scale=False):
-    """
-    Function to group data by specified columns, sum a specific column, and plot a bar chart.
-    
-    Parameters:
-    - df: DataFrame to be used for plotting
-    - group_columns: Columns to group by (can be one or more)
-    - sum_column: The column to sum after grouping
-    - y_label: Label for the y-axis
-    - title: Title for the plot
-    - file_name: Path to save the plot
-    - log_scale: Whether to use a logarithmic scale on the y-axis (default is False)
-    """
-    # Group by the specified columns and sum the specified column
-    grouped_data = df.groupby(group_columns)[sum_column].sum()
-    
-    # Plot the data
-    plt.figure(figsize=(20, 6))
-    grouped_data.plot(kind="bar", color='skyblue', edgecolor='black')
-    
-    # Set logarithmic scale if specified
-    if log_scale:
-        plt.yscale('log')
-    
-    # Customize the plot
-    plt.xticks(rotation=45, ha='right')
-    plt.ylabel(y_label, fontsize=12)
-    plt.title(title, fontsize=14)
-    plt.grid(axis='y', linestyle='--', alpha=0.7)
-    plt.tick_params(axis='both', which='major', labelsize=10)
-    plt.tight_layout()
-    
-    # Save the plot
-    plt.savefig(file_name)
-    plt.close()
+# Histogram for subjects vs unique sequences per individual
+subject_sizes = ddf.groupby(["Subject", "Author"])["Unique_sequences"].sum().compute().reset_index()
 
-# Plot total size by publication
-plot_grouped_data(df, ["Author"], "Size_MB", "Total Size (MB)", "Total Size by Publication", "plots/total_size_by_publication.pdf")
+bin_edges = [0, 100, 1000, 10000, 100000, 1000000, 10000000, float("inf")]
+subject_sizes_bins = pd.cut(subject_sizes["Unique_sequences"], bins=bin_edges)
 
-# Plot total sequences by publication
-plot_grouped_data(df, ["Author"], "Total sequences", "Total sequences", "Total sequences by Publication", "plots/total_sequences_by_publication.pdf")
-
-# Plot unique sequences by publication
-plot_grouped_data(df, ["Author"], "Unique sequences", "Unique sequences", "Unique sequences by Publication", "plots/unique_sequences_by_publication.pdf")
-
-# Plot unique sequences by subject and publication
-plot_grouped_data(df, ["Subject", "Author"], "Unique sequences", "Unique sequences", "Unique Sequences by Subject and Publication", "plots/unique_sequences_by_subject_log.pdf", log_scale=True)
-
-plot_grouped_data(df, ["Subject", "Author"], "Unique sequences", "Unique sequences", "Unique Sequences by Subject and Publication", "plots/unique_sequences_by_subject.pdf")
-
-
-# Histogram of subjects within a range of unique sequences per subject
-subject_sizes = df.groupby(["Subject", "Author"])["Unique sequences"].sum()
-subject_sizes = subject_sizes.reset_index()
-num_bins = 10
-subject_sizes_bins = pd.cut(subject_sizes["Unique sequences"], bins=num_bins)
-bin_edges = [0, 100, 1000, 10000, 100000, 1000000, 10000000,float('inf')]  # Customize this based on your data
-subject_sizes_bins = pd.cut(subject_sizes["Unique sequences"], bins=bin_edges)
 bin_counts = subject_sizes_bins.value_counts().sort_index()
 plt.figure(figsize=(10, 6))
-bin_counts.plot(kind='bar', color='skyblue', edgecolor='black')
+bin_counts.plot(kind="bar", color="skyblue", edgecolor="black")
 plt.xlabel("Range of Unique Sequences per Individual", fontsize=12)
 plt.ylabel("Number of Subjects", fontsize=12)
 plt.title("Histogram of Subjects by Range of Unique Sequences", fontsize=14)
-plt.xticks(rotation=45, ha='right')
-plt.grid(axis='y', linestyle='--', alpha=0.7)
-plt.tick_params(axis='both', which='major', labelsize=10)
+plt.xticks(rotation=45, ha="right")
+plt.grid(axis="y", linestyle="--", alpha=0.7)
+plt.tick_params(axis="both", which="major", labelsize=10)
 plt.tight_layout()
-plt.savefig("plots/histogram_unique_sequences_by_subject.pdf")
+plt.savefig(PLOT_DIR / "histogram_unique_sequences_by_subject.pdf")
 
-# Plot the number of sequences per species
-species_sizes = df.groupby("Species")["Unique sequences"].sum().sort_values(ascending=False)
+# Unique sequences per species
+species_sizes = ddf.groupby("Species")["Unique_sequences"].sum().compute().sort_values(ascending=False)
 plt.figure(figsize=(10, 6))
-species_sizes.plot(kind="bar", color='skyblue', edgecolor='black')
-plt.xticks(rotation=45, ha='right')
+species_sizes.plot(kind="bar", color="skyblue", edgecolor="black")
+plt.xticks(rotation=45, ha="right")
 plt.ylabel("Unique sequences", fontsize=12)
 plt.title("Unique sequences by species", fontsize=14)
-plt.grid(axis='y', linestyle='--', alpha=0.7)
-plt.tick_params(axis='both', which='major', labelsize=10)
+plt.grid(axis="y", linestyle="--", alpha=0.7)
+plt.tick_params(axis="both", which="major", labelsize=10)
 plt.tight_layout()
-plt.savefig("plots/unique_sequences_by_species.pdf")
+plt.savefig(PLOT_DIR / "unique_sequences_by_species.pdf")
 
-def plot_filtered_labels(df, group_columns, sum_column, y_label, title, file_name, label_threshold, log_scale=False):
-    """
-    Groups data by specified columns, sums a specific column, and plots a bar chart,
-    but only shows x-axis labels for entries above a given threshold (keeping original order).
+# Filtered label plot example
+plot_filtered_labels(
+    ddf,
+    ["Subject", "Author"],
+    "Unique_sequences",
+    "Unique sequences",
+    "Unique Sequences by Subject and Publication",
+    PLOT_DIR / "filtered_unique_sequences_by_subject.pdf",
+    label_threshold=10_000_000,
+    log_scale=False,
+)
 
-    Parameters:
-    - df: DataFrame to be used for plotting
-    - group_columns: Columns to group by (one or more)
-    - sum_column: The column to sum after grouping
-    - y_label: Label for the y-axis
-    - title: Title for the plot
-    - file_name: Path to save the plot
-    - label_threshold: Minimum value of sum_column required to display the x-axis label
-    - log_scale: Whether to use a logarithmic scale on the y-axis (default: False)
-    """
-    # Group the data while preserving the original order
-    grouped_data = df.groupby(group_columns, sort=False)[sum_column].sum()
+plot_filtered_labels(
+    ddf,
+    ["Subject", "Author"],
+    "Unique_sequences",
+    "Unique sequences",
+    "Unique Sequences by Subject and Publication",
+    PLOT_DIR / "filtered_unique_sequences_by_subject2.pdf",
+    label_threshold=10_000_000,
+    log_scale=False,
+)
 
-    # Create labels: Keep only those above threshold, replace others with empty strings
-    labels = [idx if value > label_threshold else "" for idx, value in zip(grouped_data.index, grouped_data.values)]
-    
-    # Plot the data
-    plt.figure(figsize=(20, 12))
-    grouped_data.plot(kind="bar", color='skyblue', edgecolor='black')
-
-    # Set custom x-tick labels with filtered labels (preserving order)
-    plt.xticks(ticks=range(len(labels)), labels=labels, rotation=45, ha='right')
-
-    # Set logarithmic scale if needed
-    if log_scale:
-        plt.yscale('log')
-
-    # Customize the plot
-    plt.ylabel(y_label, fontsize=12)
-    plt.title(title, fontsize=14)
-    plt.grid(axis='y', linestyle='--', alpha=0.7)
-    plt.tick_params(axis='both', which='major', labelsize=10)
-    plt.tight_layout()
-
-    # Save the plot
-    plt.savefig(file_name)
-    plt.close()
-
-# Example usage with a threshold of 1,000,000 unique sequences
-plot_filtered_labels(df, ["Subject", "Author"], "Unique sequences", 
-                     "Unique sequences", "Unique Sequences by Subject and Publication",
-                     "plots/filtered_unique_sequences_by_subject.pdf",
-                     label_threshold=10_000_000, log_scale=False)
-
-def plot_filtered_labels(df, group_columns, sum_column, y_label, title, file_name, label_threshold, log_scale=False):
-    """
-    Groups data by specified columns, sums a specific column, and plots a bar chart,
-    but only shows x-axis labels for entries above a given threshold (keeping original order).
-
-    Parameters:
-    - df: DataFrame to be used for plotting
-    - group_columns: Columns to group by (one or more)
-    - sum_column: The column to sum after grouping
-    - y_label: Label for the y-axis
-    - title: Title for the plot
-    - file_name: Path to save the plot
-    - label_threshold: Minimum value of sum_column required to display the x-axis label
-    - log_scale: Whether to use a logarithmic scale on the y-axis (default: False)
-    """
-    # Group the data while preserving the original order
-    grouped_data = df.groupby(group_columns, sort=False)[sum_column].sum()
-
-    # Create labels: Keep only those above threshold, replace others with empty strings
-    labels = [idx if value > label_threshold else "" for idx, value in zip(grouped_data.index, grouped_data.values)]
-    
-    # Plot the data
-    plt.figure(figsize=(20, 16))
-    bars = plt.bar(range(len(grouped_data)), grouped_data.values, color='skyblue', edgecolor='black')
-
-    # Set custom x-tick labels with filtered labels (preserving order)
-    plt.xticks(ticks=range(len(labels)), labels=labels, rotation=45, ha='right', fontsize=10)
-
-    # Set logarithmic scale if needed
-    if log_scale:
-        plt.yscale('log')
-
-    # Customize the plot
-    plt.ylabel(y_label, fontsize=14)
-    plt.title(title, fontsize=16, pad=20)
-    plt.grid(axis='y', linestyle='--', alpha=0.7)
-    plt.tick_params(axis='both', which='major', labelsize=12)
-
-    # Annotate bars with their values if they are above a certain threshold
-    for bar in bars:
-        height = bar.get_height()
-        if height > label_threshold:
-            plt.text(bar.get_x() + bar.get_width()/2., height,
-                    f'{int(height)}', 
-                    ha='center', va='bottom', fontsize=10)
-
-    plt.tight_layout()
-
-    # Save the plot
-    plt.savefig(file_name, bbox_inches='tight')
-    plt.close()
-
-# Example usage with a threshold of 1,000,000 unique sequences
-plot_filtered_labels(df, ["Subject", "Author"], "Unique sequences", 
-                     "Unique sequences", "Unique Sequences by Subject and Publication",
-                     "plots/filtered_unique_sequences_by_subject2.pdf",
-                     label_threshold=10_000_000, log_scale=False)
