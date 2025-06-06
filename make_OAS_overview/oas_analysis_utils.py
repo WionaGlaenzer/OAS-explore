@@ -74,9 +74,9 @@ def load_oas_overview(path: str) -> dd.DataFrame:
     """Load the OAS overview CSV using Dask and clean numeric columns."""
 
     ddf = dd.read_csv(path)
-    ddf["Age"] = dd.to_numeric(ddf["Age"], errors="coerce")
+    #ddf["Age"] = dd.to_numeric(ddf["Age"], errors="coerce")
     ddf["Unique_sequences"] = dd.to_numeric(ddf["Unique_sequences"], errors="coerce")
-    ddf = ddf[(ddf["Age"].notnull()) & (ddf["Unique_sequences"].notnull())]
+    #ddf = ddf[(ddf["Age"].notnull()) & (ddf["Unique_sequences"].notnull())]
     return ddf
 
 
@@ -96,15 +96,22 @@ def plot_grouped_data(df, group_columns, sum_column, y_label, title, file_name, 
     grouped_data = _compute_grouped_sum(df, group_columns, sum_column)
 
     plt.figure(figsize=(20, 6))
-    grouped_data.plot(kind="bar", color="skyblue", edgecolor="black")
+    ax = grouped_data.plot(kind="bar", color="skyblue", edgecolor="black")
+
+    # Set grid below the bars and enable light gray horizontal lines
+    ax.set_axisbelow(True)
+    ax.grid(axis="y", linestyle="--", color="gray", alpha=0.3)
+
+    # Remove top and right spines (box lines)
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
 
     if log_scale:
-        plt.yscale("log")
+        ax.set_yscale("log")
 
     plt.xticks(rotation=45, ha="right")
     plt.ylabel(y_label, fontsize=12)
     plt.title(title, fontsize=14)
-    plt.grid(axis="y", linestyle="--", alpha=0.7)
     plt.tick_params(axis="both", which="major", labelsize=10)
     plt.tight_layout()
     plt.savefig(file_name)

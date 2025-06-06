@@ -10,7 +10,7 @@ from oas_analysis_utils import (
 )
 
 
-INPUT_FILE = Path("../assets/OAS_overview.csv")
+INPUT_FILE = Path("assets/OAS_overview.csv")
 PLOT_DIR = Path("plots")
 PLOT_DIR.mkdir(exist_ok=True)
 
@@ -22,6 +22,7 @@ print("File read complete")
 
 df = ddf.compute()
 
+"""
 # Weighted histogram of sequences per age
 plt.figure(figsize=(10, 6))
 plt.hist(
@@ -37,6 +38,7 @@ plt.title("Histogram of Unique Sequences per Age")
 plt.grid(axis="y", linestyle="--", alpha=0.7)
 plt.savefig(PLOT_DIR / "sequences_per_age.pdf", format="pdf")
 print("Histogram saved as sequences_per_age.pdf")
+"""
 
 # Publications with subject "no"
 print(ddf[ddf["Subject"] == "no"]["Author"].unique().compute())
