@@ -6,6 +6,7 @@ __all__ = [
     "analyze_isotype_sequences",
     "load_oas_overview",
     "plot_grouped_data",
+    "plot_grouped_data_two_bars",
     "plot_filtered_labels",
 ]
 
@@ -103,6 +104,52 @@ def plot_grouped_data(df, group_columns, sum_column, y_label, x_label, title, fi
     ax.grid(axis="y", linestyle="--", color="gray", alpha=0.3)
 
     # Remove top and right spines (box lines)
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+
+    if log_scale:
+        ax.set_yscale("log")
+
+    plt.xticks(rotation=45, ha="right")
+    plt.ylabel(y_label, fontsize=12)
+    plt.xlabel(x_label, fontsize=12)
+    plt.title(title, fontsize=14)
+    plt.tick_params(axis="both", which="major", labelsize=10)
+    plt.tight_layout()
+    plt.savefig(file_name)
+    plt.close()
+
+
+def plot_grouped_data_two_bars(
+    df,
+    group_columns,
+    sum_column,
+    y_label,
+    x_label,
+    title,
+    file_name,
+    log_scale=False,
+):
+    """Group by two columns where the second column is binary and plot side-by-side bars."""
+
+    if len(group_columns) != 2:
+        raise ValueError("Exactly two group columns must be provided")
+
+    group1, group2 = group_columns
+
+    grouped = _compute_grouped_sum(df, [group1, group2], sum_column)
+
+    grouped_df = grouped.reset_index().pivot(index=group1, columns=group2, values=sum_column).fillna(0)
+
+    plt.figure(figsize=(20, 6))
+    ax = grouped_df.plot(
+        kind="bar",
+        color=["lightblue", "darkblue"],
+        edgecolor="black",
+    )
+
+    ax.set_axisbelow(True)
+    ax.grid(axis="y", linestyle="--", color="gray", alpha=0.3)
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
 
