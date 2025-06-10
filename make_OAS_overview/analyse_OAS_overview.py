@@ -80,7 +80,7 @@ plot_grouped_data_two_bars(
     "Unique_sequences",
     "Unique sequences",
     "Species",
-    "Unique Sequences by Species and Chain (Grouped)",
+    "Unique Sequences by Species and Chain",
     PLOT_DIR / "unique_sequences_by_species_chain_grouped.pdf",
 )
 
