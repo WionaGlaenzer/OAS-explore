@@ -16,6 +16,8 @@ python3.11 -m venv pipeline
 source pipeline/bin/activate
 pip install -r requirements.txt
 
+Model training requires an additional environment with the necessary packages.
+
 ## Run the pipeline
 
 Use the command *snakemake* to run the pipeline.
