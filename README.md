@@ -25,7 +25,7 @@ Use the command *snakemake* to run the pipeline.
 Required computational resources depend on the filtering choices. 
 Downloading and processing most publications from OAS takes approximately 3 days on 1 CPU with 300gb memory.
 
-## Log in to weights and biases
+## Log in to weights and biases for tracking during model training
 
 - Make sure you have created a *training environment* for model training
 - Activate the *training environment*
