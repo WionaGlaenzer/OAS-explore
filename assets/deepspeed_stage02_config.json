@@ -1,0 +1,16 @@
+{
+    "fp16": {
+      "enabled": true
+    },
+    "optimizer": {
+      "type": "AdamW",
+      "params": { "lr": "auto" }
+    },
+    "scheduler": {
+       "type": "WarmupLR",
+       "params": { "warmup_num_steps": "auto" }
+    },
+    "zero_optimization": {
+       "stage": 0
+    }
+  }
