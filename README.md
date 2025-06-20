@@ -1,5 +1,5 @@
-# plm_training_pipeline
-A snakemake pipeline for training antibody language models
+# Antibody PLM Training Pipeline
+A snakemake pipeline for training antibody language models on data from the OAS.
 
 ## Rules of the pipeline
 
