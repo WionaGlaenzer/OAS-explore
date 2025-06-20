@@ -5,8 +5,10 @@ downloading/
 outputs/
 linclust/
 slurm*
-results/
-wandb/
-mmseqs/
 *.pdf
 *.png
+plots/
+results/
+wandb/
+model_assessment/
+mmseqs/
