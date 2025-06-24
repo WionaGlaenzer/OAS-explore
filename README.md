@@ -1,36 +1,93 @@
 # Antibody PLM Training Pipeline
-A snakemake pipeline for training antibody language models on data from the OAS.
 
-## Rules of the pipeline
+A fully reproducible **Snakemake** workflow for training antibody protein‑language models (PLMs) on data from the *Observed Antibody Space* (**OAS**) database.
 
-The rulegraph shows the rules:
+---
 
-<img src="rulegraph.png" width="300" alt="Rule graph">
+## ✨ Key Features
 
-## Setting up the pipeline
+- **End‑to‑end workflow** – from raw OAS downloads to trained models.
+- **Portable & scalable** – tested on ETHZ Euler HPC but adaptable to any cluster.
+- **Economical** - the workflow is designed to be suitable for acdemic researchers with limited computational ressources.
 
-On Euler:
-module load stack/2024-06 gcc/12.2.0
-module load python/3.11.6 cuda/12.1.1 ninja/1.11.1
+---
+
+## 📂 Pipeline Overview
+
+![Snakemake rule DAG](rulegraph.png)
+
+
+## ⚙️ Installation
+
+### Create Environment
+
+```bash
+# 1. Load compiler / CUDA / Python modules (required when runnning on ETHZ Euler)
+module load stack/2024-06  gcc/12.2.0
+module load python/3.11.6  cuda/12.1.1  ninja/1.11.1
+
+# 2. Create and activate the Snakemake environment
 python3.11 -m venv pipeline
 source pipeline/bin/activate
+
+# 3. Install pipeline dependencies
+pip install --upgrade pip
 pip install -r requirements.txt
+```
 
-Linclust has to be installed separately following these instructions: https://github.com/soedinglab/mmseqs2/wiki#install-mmseqs2-for-linux
-On Euler we followed the steps listed in the section "Compile from source under Linux".
+### Install Linclust (mmseqs2)
 
-Model training requires an additional environment with the necessary packages.
+Follow the **“Compile from source under Linux”** instructions in the  
+<https://github.com/soedinglab/mmseqs2/wiki#install-mmseqs2-for-linux> guide.  
 
-## Run the pipeline
+### Create the *training* environment
 
-Use the command *snakemake* to run the pipeline.
+Model training relies on additional deep‑learning packages (PyTorch, etc.).
 
-Required computational resources depend on the filtering choices. 
-Downloading and processing most publications from OAS takes approximately 3 days on 1 CPU with 300gb memory.
+```bash
+python3.11 -m venv training
+source training/bin/activate
+pip install -r requirements-training.txt
+```
 
-## Log in to weights and biases for tracking during model training
+---
 
-- Make sure you have created a *training environment* for model training
-- Activate the *training environment*
-- Run "wandb login"
-- Enter the API key from the weights and biases website. If you don't have an account yet, create a free account first.
+## 🚀 Running the Pipeline
+
+```bash
+# Dry‑run first
+snakemake -n
+
+# Execute
+snakemake
+```
+
+> **Tip:** Downloading & preprocessing most OAS publications takes **≈ 3 days**
+> on **1 CPU / 300 GB RAM**. Filtering choices and cluster parameters will affect runtime.
+
+---
+
+## 📊 Tracking Training with Weights & Biases
+
+1. Activate the **training** environment  
+   ```bash
+   source training/bin/activate
+   ```
+2. Log in once per workspace  
+   ```bash
+   wandb login
+   ```
+3. Paste your personal API key (create a free W&B account if needed).  
+   The Snakemake rule `train_model` will now stream metrics automatically.
+
+---
+
+## 🏗️ Contributing
+
+Pull requests are welcome! Please open an issue first to discuss major changes.
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License**.
