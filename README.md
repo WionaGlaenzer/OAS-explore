@@ -2,20 +2,15 @@
 
 A fully reproducible **Snakemake** workflow for training antibody protein‑language models (PLMs) on data from the *Observed Antibody Space* (**OAS**) database.
 
----
-
 ## ✨ Key Features
 
 - **End‑to‑end workflow** – from raw OAS downloads to trained models.
 - **Portable & scalable** – tested on ETHZ Euler HPC but adaptable to any cluster.
 - **Economical** - the workflow is designed to be suitable for acdemic researchers with limited computational ressources.
 
----
-
 ## 📂 Pipeline Overview
 
-![Snakemake rule DAG](rulegraph.png)
-
+<img src="rulegraph.png" width="300" alt="Rule graph">
 
 ## ⚙️ Installation
 
@@ -50,8 +45,6 @@ source training/bin/activate
 pip install -r requirements-training.txt
 ```
 
----
-
 ## 🚀 Running the Pipeline
 
 ```bash
@@ -64,8 +57,6 @@ snakemake
 
 > **Tip:** Downloading & preprocessing most OAS publications takes **≈ 3 days**
 > on **1 CPU / 300 GB RAM**. Filtering choices and cluster parameters will affect runtime.
-
----
 
 ## 📊 Tracking Training with Weights & Biases
 
@@ -80,13 +71,11 @@ snakemake
 3. Paste your personal API key (create a free W&B account if needed).  
    The Snakemake rule `train_model` will now stream metrics automatically.
 
----
 
 ## 🏗️ Contributing
 
 Pull requests are welcome! Please open an issue first to discuss major changes.
 
----
 
 ## 📄 License
 
