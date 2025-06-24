@@ -7,7 +7,7 @@ The rulegraph shows the rules:
 
 <img src="rulegraph.png" width="300" alt="Rule graph">
 
-## Creating an environment to run the pipeline:
+## Setting up the pipeline
 
 On Euler:
 module load stack/2024-06 gcc/12.2.0
@@ -15,6 +15,9 @@ module load python/3.11.6 cuda/12.1.1 ninja/1.11.1
 python3.11 -m venv pipeline
 source pipeline/bin/activate
 pip install -r requirements.txt
+
+Linclust has to be installed separately following these instructions: https://github.com/soedinglab/mmseqs2/wiki#install-mmseqs2-for-linux
+On Euler we followed the steps listed in the section "Compile from source under Linux".
 
 Model training requires an additional environment with the necessary packages.
 
