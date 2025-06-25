@@ -33,7 +33,11 @@ pip install -r requirements.txt
 ### Install Linclust (mmseqs2)
 
 Follow the **“Compile from source under Linux”** instructions in the  
-<https://github.com/soedinglab/mmseqs2/wiki#install-mmseqs2-for-linux> guide.  
+<https://github.com/soedinglab/mmseqs2/wiki#install-mmseqs2-for-linux> guide.
+Then add the directory you installed it in to your .basrc:
+```bash
+export PATH=$(pwd)/bin/:$PATH
+```
 
 ### Create the *training* environment
 
