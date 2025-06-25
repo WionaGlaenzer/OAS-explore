@@ -34,7 +34,7 @@ pip install -r requirements.txt
 
 Follow the **“Compile from source under Linux”** instructions in the  
 <https://github.com/soedinglab/mmseqs2/wiki#install-mmseqs2-for-linux> guide.
-Then add the directory you installed it in to your .basrc:
+Then add the directory you installed it in to your .bashrc:
 ```bash
 export PATH=$(pwd)/bin/:$PATH
 ```
