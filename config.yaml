@@ -11,13 +11,9 @@ pipeline_stages:
 
 ###### File paths #####
 
-download_dir: "/REDACTED/PATHroject/reddy/REDACTED/PATHne_revisions/human/download"
-output_dir: "/REDACTED/PATHroject/reddy/REDACTED/PATHne_revisions/human/output"
-linclust_dir: "/REDACTED/PATHroject/reddy/REDACTED/PATHne_revisions/human/linclust"
-
-output_dir: "/REDACTED/PATHroject/reddy/REDACTED/PATHretraining/OAS_wo_Soto/output"
-download_dir: "/REDACTED/PATHroject/reddy/REDACTED/PATHretraining/OAS_wo_Soto/download"
-linclust_dir: "/REDACTED/PATHroject/reddy/REDACTED/PATHretraining/OAS_wo_Soto/linclust"
+download_dir: "/REDACTED/PATHroject/reddy/REDACTED/PATHretraining/human_light_chain/download"
+output_dir: "/REDACTED/PATHroject/reddy/REDACTED/PATHretraining/human_light_chain/output"
+linclust_dir: "/REDACTED/PATHroject/reddy/REDACTED/PATHretraining/human_light_chain/linclust"
 cache_dir: "/REDACTED/PATHratch/REDACTED/PATHngface_cache"
 training_environment: "/REDACTED/PATHroject/reddy/REDACTED/PATHnvironments/training"
 wandb_base_dir: "/REDACTED/PATHroject/reddy/REDACTED/PATHretraining"
@@ -29,7 +25,7 @@ filtering:
   #max_sequences: 100000       # Limit dataset to 100,000 sequences (not implemented yet)
   #min_length: 50              # Minimum sequence length (not implemented yet)
   #max_length: 1000            # Maximum sequence length (not implemented yet)
-  filter_by_region_length: False  # TODO: Filter sequences by region length
+  filter_by_region_length: True  # TODO: Filter sequences by region length
 
 linclust:
   coverage: 0.9
@@ -39,9 +35,14 @@ linclust:
 filters:
   Species:
     #- "rabbit"
-    #- "human"
+    - "human"
     #- "mouse_C57BL/6"
-    - "mouse_BALB/c"
+    #- "mouse_BALB/c"
+    #- "mouse"
+    #- "HIS-mouse"
+    #- "Kymouse"
+    #- "mouse_Swiss-Webster"
+    #- "mouse_RAG2-GFP/129Sve"
   #Author: # Use the publication name as it appears on OAS
     #- 'Bashford et al., 2013'
     #- 'Bender et al., 2020'
@@ -172,18 +173,18 @@ filters:
 
 columns_to_keep:
   - "locus"
-  #- "fwr1_aa"
-  #- "cdr1_aa"
-  #- "fwr2_aa"
-  #- "cdr2_aa"
-  #- "fwr3_aa"
-  #- "cdr3_aa"
-  #- "fwr4_aa"
+  - "fwr1_aa"
+  - "cdr1_aa"
+  - "fwr2_aa"
+  - "cdr2_aa"
+  - "fwr3_aa"
+  - "cdr3_aa"
+  - "fwr4_aa"
   - "v_call"
   - "d_call"
   - "j_call"
-  #- "ANARCI_numbering"
-  #- "Redundancy"
+  - "ANARCI_numbering"
+  - "Redundancy"
 
 
 ###### Data sampling #####
@@ -195,6 +196,8 @@ n_lines: 1
 
 training_fraction: 0.8
 validation_fraction: 0.1
+
+split_mode: "fraction"
 
 ###### Model settings #####
 
