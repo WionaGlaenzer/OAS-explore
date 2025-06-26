@@ -10,15 +10,12 @@ training_fraction="$5"
 validation_fraction="$6"
 no_seqs_to_use="$7"
 temp_location="$8"
+split_mode="${9:-fraction}"  # New parameter: "fraction" or "numbers"
 
 # Derive .csv filenames from .txt filenames
 training_csv="${training_file%.txt}.csv"
 validation_csv="${validation_file%.txt}.csv"
 testing_csv="${testing_file%.txt}.csv"
-
-# Calculate testing fraction
-testing_fraction=$(echo "1 - $training_fraction - $validation_fraction" | bc -l)
-echo "Testing fraction: $testing_fraction"
 
 # Create temp directory if it doesn't exist
 mkdir -p "$temp_location"
@@ -38,10 +35,41 @@ fi
 # Count total data lines
 total_lines=$(wc -l < "$temp_location/shuffled_data.csv")
 
-# Calculate splits
-training_lines=$(echo "$total_lines * $training_fraction" | bc | awk '{print int($1)}')
-validation_lines=$(echo "$total_lines * $validation_fraction" | bc | awk '{print int($1)}')
-testing_lines=$((total_lines - training_lines - validation_lines))
+# Calculate splits based on mode
+if [ "$split_mode" = "numbers" ]; then
+    # Mode: Use raw numbers
+    training_lines="$training_fraction"
+    validation_lines="$validation_fraction"
+    testing_lines=$((total_lines - training_lines - validation_lines))
+    
+    # Validate that numbers don't exceed total
+    if [ $((training_lines + validation_lines)) -gt $total_lines ]; then
+        echo "Error: Training + validation sequences ($((training_lines + validation_lines))) exceed total available ($total_lines)"
+        exit 1
+    fi
+    
+    echo "Using raw numbers:"
+    echo "Training sequences: $training_lines"
+    echo "Validation sequences: $validation_lines"
+    echo "Testing sequences: $testing_lines"
+    echo "Total sequences: $total_lines"
+    
+else
+    # Mode: Use fractions (default behavior)
+    testing_fraction=$(echo "1 - $training_fraction - $validation_fraction" | bc -l)
+    echo "Testing fraction: $testing_fraction"
+    
+    # Calculate splits from fractions
+    training_lines=$(echo "$total_lines * $training_fraction" | bc | awk '{print int($1)}')
+    validation_lines=$(echo "$total_lines * $validation_fraction" | bc | awk '{print int($1)}')
+    testing_lines=$((total_lines - training_lines - validation_lines))
+    
+    echo "Using fractions:"
+    echo "Training fraction: $training_fraction -> $training_lines sequences"
+    echo "Validation fraction: $validation_fraction -> $validation_lines sequences"
+    echo "Testing fraction: $testing_fraction -> $testing_lines sequences"
+    echo "Total sequences: $total_lines"
+fi
 
 # Generate training CSV
 echo "$header" > "$training_csv"

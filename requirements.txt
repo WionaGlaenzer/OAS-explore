@@ -3,3 +3,4 @@ snakemake
 pandas
 matplotlib
 dask
+cmake

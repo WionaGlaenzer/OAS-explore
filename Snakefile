@@ -82,16 +82,16 @@ rule all:
         #f"{output_dir}/sequences_filtered.csv",
         #f"{output_dir}/sequences_filtered_processed.csv",
         #f"{output_dir}/number_of_seqs_per_individual.csv",
-        #f"{output_dir}/sampled_sequences.csv",
-        #f"{output_dir}/test_set.csv",
-        #f"{output_dir}/training_set.csv",
+        f"{output_dir}/sampled_sequences.csv",
+        f"{output_dir}/test_set.txt",
+        f"{output_dir}/training_set.txt",
         #f"{output_dir}/training.txt",
         #"/REDACTED/PATH"
         #f"{output_dir}/download_progress.txt",
         #f"{output_dir}/sampled_sequences_round_robin.csv",
         #directory(f"{output_dir}/model/"),
         #f"{output_dir}/sequences_per_individual/.done"
-        get_final_targets(wildcards)
+        #get_final_targets(wildcards)
 
 rule select_files_to_download:
     """
@@ -329,35 +329,37 @@ rule number_of_seqs_overview:
 rule split_data:
     """
     Splits the data into training, validation and test sets.
+    Supports both fraction-based and number-based splitting.
     """
     input:
         sequences_csv = f"{output_dir}/sampled_sequences.csv"
     output:
-        training = f"{output_dir}/training_set.csv",
-        validation = f"{output_dir}/validation_set.csv",
-        test = f"{output_dir}/test_set.csv"
+        training = f"{output_dir}/training_set.txt",
+        validation = f"{output_dir}/validation_set.txt",
+        test = f"{output_dir}/test_set.txt"
     params:
         training_fraction = config["training_fraction"],
-        validation_fraction = config["validation_fraction"]
-    run:
-        shell(f"bash pipeline/split_data.sh {input.sequences_csv} {output.training} {output.validation} {output.test} {params.training_fraction} {params.validation_fraction} 0 {output_dir}")
+        validation_fraction = config["validation_fraction"],
+        split_mode = config.get("split_mode", "fraction")
+    shell:
+        "bash pipeline/split_data.sh {input.sequences_csv} {output.training} {output.validation} {output.test} {params.training_fraction} {params.validation_fraction} 0 {output_dir} {params.split_mode}"
 
-rule csv_to_txt:
-    """
-    Converts the training, validation, and test sets to txt files containing only the sequences without metadata.
-    """
-    input:
-        training = f"{output_dir}/training_set.csv",
-        validation = f"{output_dir}/validation_set.csv",
-        test = f"{output_dir}/test_set.csv"
-    output:
-        training = f"{output_dir}/training.txt",
-        validation = f"{output_dir}/validation.txt",
-        test = f"{output_dir}/test.txt"
-    run:
-        csv_to_txt(input.training, output.training)
-        csv_to_txt(input.validation, output.validation)
-        csv_to_txt(input.test, output.test)
+#rule csv_to_txt:
+#    """
+#    Converts the training, validation, and test sets to txt files containing only the sequences without metadata.
+#    """
+#    input:
+#        training = f"{output_dir}/training_set.csv",
+#        validation = f"{output_dir}/validation_set.csv",
+#        test = f"{output_dir}/test_set.csv"
+#    output:
+#        training = f"{output_dir}/training.txt",
+#        validation = f"{output_dir}/validation.txt",
+#        test = f"{output_dir}/test.txt"
+#    run:
+#        csv_to_txt(input.training, output.training)
+#        csv_to_txt(input.validation, output.validation)
+#        csv_to_txt(input.test, output.test)
 
 rule model_training:
     input:
