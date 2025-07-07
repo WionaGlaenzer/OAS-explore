@@ -97,7 +97,7 @@ def plot_grouped_data(df, group_columns, sum_column, y_label, x_label, title, fi
     grouped_data = _compute_grouped_sum(df, group_columns, sum_column)
 
     plt.figure(figsize=(20, 6))
-    ax = grouped_data.plot(kind="bar", color="skyblue", edgecolor="black")
+    ax = grouped_data.plot(kind="bar", width=0.95, color="#c7e9b4", edgecolor="none", linewidth=0)
 
     # Set grid below the bars and enable light gray horizontal lines
     ax.set_axisbelow(True)
@@ -116,7 +116,11 @@ def plot_grouped_data(df, group_columns, sum_column, y_label, x_label, title, fi
     plt.title(title, fontsize=14)
     plt.tick_params(axis="both", which="major", labelsize=10)
     plt.tight_layout()
-    plt.savefig(file_name)
+    plt.savefig(
+        str(file_name),
+        format="pdf",
+        backend="cairo",
+    )
     plt.close()
 
 
@@ -144,8 +148,10 @@ def plot_grouped_data_two_bars(
     plt.figure(figsize=(20, 6))
     ax = grouped_df.plot(
         kind="bar",
-        color=["lightblue", "darkblue"],
-        edgecolor="black",
+        width=0.9,
+        color=["#c7e9b4", "#225ea8"],
+        edgecolor="none",
+        linewidth=0,
     )
 
     ax.set_axisbelow(True)
@@ -162,7 +168,12 @@ def plot_grouped_data_two_bars(
     plt.title(title, fontsize=14)
     plt.tick_params(axis="both", which="major", labelsize=10)
     plt.tight_layout()
-    plt.savefig(file_name)
+    plt.savefig(
+        str(file_name),
+        #bbox_inches='tight',
+        format="pdf",          # vector output
+        backend="cairo",       # omit this line if Cairo isn’t installed
+    )
     plt.close()
 
 
