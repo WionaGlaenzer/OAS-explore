@@ -91,13 +91,13 @@ def _compute_grouped_sum(df, group_columns, sum_column):
     return grouped
 
 
-def plot_grouped_data(df, group_columns, sum_column, y_label, x_label, title, file_name, log_scale=False):
+def plot_grouped_data(df, group_columns, sum_column, y_label, x_label, title, file_name, log_scale=False, x_labels=True):
     """Group data by columns, sum, and plot a bar chart."""
 
     grouped_data = _compute_grouped_sum(df, group_columns, sum_column)
 
     plt.figure(figsize=(20, 6))
-    ax = grouped_data.plot(kind="bar", width=0.95, color="#c7e9b4", edgecolor="none", linewidth=0)
+    ax = grouped_data.plot(kind="bar", width=0.95, color="#225ea8", edgecolor="none", linewidth=0)
 
     # Set grid below the bars and enable light gray horizontal lines
     ax.set_axisbelow(True)
@@ -112,7 +112,13 @@ def plot_grouped_data(df, group_columns, sum_column, y_label, x_label, title, fi
 
     plt.xticks(rotation=45, ha="right")
     plt.ylabel(y_label, fontsize=12)
-    plt.xlabel(x_label, fontsize=12)
+    ax = plt.gca()
+    if x_labels:
+        plt.xlabel(x_label, fontsize=12)
+    else:
+        ax.tick_params(axis='x', width=0.3)  # make the x-axis ticks thinner
+        ax.tick_params(labelbottom=False)    # hide only the labels
+        #ax.set_xticks([])                
     plt.title(title, fontsize=14)
     plt.tick_params(axis="both", which="major", labelsize=10)
     plt.tight_layout()

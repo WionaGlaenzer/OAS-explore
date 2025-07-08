@@ -72,7 +72,7 @@ plot_grouped_data(ddf, ["Author"], "Size_MB", "Total Size (MB)", "Publication", 
 plot_grouped_data(ddf, ["Author"], "Total_sequences", "Total sequences", "Publication", "Total sequences by Publication", PLOT_DIR / "total_sequences_by_publication.pdf")
 plot_grouped_data(ddf, ["Author"], "Unique_sequences", "Unique sequences", "Publication", "Unique sequences by Publication", PLOT_DIR / "unique_sequences_by_publication.pdf")
 plot_grouped_data(ddf, ["Subject", "Author"], "Unique_sequences", "Unique sequences", "Publication", "Unique Sequences by Subject and Publication", PLOT_DIR / "unique_sequences_by_subject_log.pdf", log_scale=True)
-plot_grouped_data(ddf, ["Subject", "Author"], "Unique_sequences", "Unique sequences", "Publication", "Unique Sequences by Subject and Publication", PLOT_DIR / "unique_sequences_by_subject.pdf")
+plot_grouped_data(ddf, ["Subject", "Author"], "Unique_sequences", "Unique sequences", "Publication", "Unique Sequences by Subject and Publication", PLOT_DIR / "unique_sequences_by_subject.pdf", x_labels=False)
 plot_grouped_data(ddf, ["Species", "Chain"], "Unique_sequences", "Unique sequences", "Species and Chain" ,"Unique Sequences by Species and Chain", PLOT_DIR / "unique_sequences_by_species_chain.pdf")
 plot_grouped_data_two_bars(
     ddf,
@@ -83,6 +83,11 @@ plot_grouped_data_two_bars(
     "Unique Sequences by Species and Chain",
     PLOT_DIR / "unique_sequences_by_species_chain_grouped.pdf",
 )
+
+# Filter dataframe to only include human data
+human_ddf = ddf[ddf["Species"] == "human"]
+plot_grouped_data(human_ddf, ["Subject", "Author"], "Unique_sequences", "Unique sequences", "Publication", "Unique Sequences by Subject and Publication", PLOT_DIR / "unique_sequences_by_subject_only_human.pdf", x_labels=False)
+
 
 
 # Histogram for subjects vs unique sequences per individual
