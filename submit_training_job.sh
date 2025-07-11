@@ -14,7 +14,7 @@ export ASSETS_DIR="${CODE_BASE}/assets"
 export TOKENIZER_PATH="${ASSETS_DIR}/antibody-tokenizer"
 export DEEPSPEED_CONFIG_PATH="${ASSETS_DIR}/deepspeed_stage2_config.json"
 export CACHE_DIR="/REDACTED/PATH"
-export MODEL_NAME="OAS_model"
+export MODEL_NAME="mouse_model"
 export DONE_FILE_PATH="${MODEL_DIR}/.done"
 export TRAIN_FILE="${PROJECT_BASE}/training.txt"
 export TEST_FILE="${PROJECT_BASE}/test.txt"
@@ -111,7 +111,7 @@ sbatch -A es_reddy --job-name="${JOB_NAME}" \
     --export=ALL \
     --wrap="python -m torch.distributed.run \
     --nproc_per_node=\$SLURM_GPUS_ON_NODE \
-    train_after_tokenization.py \
+    pipeline/train_after_tokenization.py \
     \"${TRAIN_FILE}\" \
     \"${TEST_FILE}\" \
     \"${VAL_FILE}\" \
