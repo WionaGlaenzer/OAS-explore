@@ -51,7 +51,7 @@ tail -n +2 "$input_file" | while IFS=',' read -r file_id url; do
       # Remove first two rows from original file (in-place)
       sed -i '1,2d' "$file"
       
-      # Filter the file once and process in memory
+      # Filter the file by sequence region lengths once and process in memory
       temp_file="${file}.filtered.csv"
       csvgrep -c 35 -r '^(?!\s*$).{20,50}$' -u 0 "$file" | \
       csvgrep -c 45 -r '^(?!\s*$).{10,50}$' -u 0 | \
