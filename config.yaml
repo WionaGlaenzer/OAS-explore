@@ -159,7 +159,7 @@ filters:
     #- "no"
     #- "HIV"
   Chain:
-    - "Light"
+    - "Heavy"
   #Unique_sequences:
     #min: 5
     #max: 500
@@ -183,25 +183,25 @@ columns_to_keep:
   - "v_call"
   - "d_call"
   - "j_call"
-  - "ANARCI_numbering"
+  #- "ANARCI_numbering"
   - "Redundancy"
 
 
 ###### Data sampling #####
 
-total_sequences: 1250000
+total_sequences: 1110000
 # Available options: "random", "balance_publications", "balance_individuals"
 sampling_scheme: "random"
 n_lines: 1
 
-training_fraction: 0.8
-validation_fraction: 0.1
+training_fraction: 1000000
+validation_fraction: 10000
 
-split_mode: "fraction"
+split_mode: "numbers"
 
 ###### Model settings #####
 
-model_name: "mouse_model_test"
+model_name: "human_light_model_test"
 
 tokenizer: "/REDACTED/PATH"
 
