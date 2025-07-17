@@ -183,7 +183,7 @@ columns_to_keep:
   - "v_call"
   - "d_call"
   - "j_call"
-  - "ANARCI_numbering"
+  #- "ANARCI_numbering"
   - "Redundancy"
 
 
@@ -201,7 +201,7 @@ split_mode: "numbers"
 
 ###### Model settings #####
 
-model_name: "mouse_model_test"
+model_name: "human_light_model_test"
 
 tokenizer: "/REDACTED/PATH"
 

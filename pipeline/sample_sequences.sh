@@ -24,6 +24,11 @@ fi
 head -n 1 "$input_csv" > "$output_csv"
 
 # Sample n random lines (excluding header) and append to output
-tail -n +2 "$input_csv" | shuf -n "$n_samples" >> "$output_csv"
+#tail -n +2 "$input_csv" | shuf -n "$n_samples" >> "$output_csv"
+seed=42                                 # pick any integer or string
+tail -n +2 "$input_csv" \
+  | shuf -n "$n_samples" \
+        --random-source=<(openssl enc -aes-256-ctr -pass pass:"$seed" -nosalt </dev/zero 2>/dev/null) \
+  >> "$output_csv"
 
 echo "Successfully sampled $n_samples sequences from $input_csv to $output_csv" 
