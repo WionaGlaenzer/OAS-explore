@@ -75,7 +75,7 @@ def get_final_targets(wildcards):
 
 rule all:
     input:
-        f"{output_dir}/sequences.csv",
+        #f"{output_dir}/sequences.csv",
         #f"{output_dir}/data_to_download.csv",
         #f"{output_dir}/sequences.fasta",
         #f"{linclust_dir}/antibody_DB_clu_rep.fasta",
@@ -134,15 +134,6 @@ rule download_data:
         else:
             logging.info("Length filtering is disabled. Downloading all sequences.")
             shell("bash download_no_length_filter.sh {input.data_list} {output} {params.n_lines} {col_numbers} {params.download_dir}")
-        #shell("""
-        # Check if the output file contains more than just the header
-        #line_count=$(cat {output} | wc -l)
-        # If there are no data lines (less than or equal to 1 line), raise an error and stop the pipeline
-        #if [ "$line_count" -le 1 ]; then
-        #    echo "Error: Output file {output} contains only the header and no data. Stopping the pipeline."
-        #    exit 1
-        #fi
-        #""")
 
 rule csv_to_fasta:
     """
@@ -193,11 +184,18 @@ rule process_anarci_column:
     also completes a second round of length filtering.
     """
     input:
-        sequences_csv = f"{output_dir}/sequences_filtered.csv"
+        sequences_csv = f"{output_dir}/sequences_filtered1.csv"
     output:
-        filename = f"{output_dir}/sequences_filtered_processed.csv"
+        filename = f"{output_dir}/sequences_filtered_processed.csv"    
+    params:
+        columns_to_keep = config["columns_to_keep"],
     run:
-        process_anarci_column(input.sequences_csv, output.filename)
+        #check if "ANARCI_numbering" is in the columns_to_keep list
+        if "ANARCI_numbering" in params.columns_to_keep:
+            process_anarci_column(input.sequences_csv, output.filename)
+        else:
+            shell("mv {input.sequences_csv} {output.filename}")
+
 
 rule sample_sequences:
     """
