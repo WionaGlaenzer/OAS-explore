@@ -94,7 +94,7 @@ try:
         print("Loading Pre-tokenized Datasets...")
 
     # Each process loads the already tokenized dataset
-    tokenized_dataset = load_from_disk(f"/REDACTED/PATHroject/reddy/REDACTED/PATHretraining/mouse/tokenized")
+    tokenized_dataset = load_from_disk(f"/REDACTED/PATHroject/reddy/REDACTED/PATHretraining/human/tokenized")
 
     if is_main_process:
         print("Pre-tokenized dataset loaded.")
