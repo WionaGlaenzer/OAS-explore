@@ -12,6 +12,8 @@ A fully reproducible **Snakemake** workflow for training antibody protein‑lang
 
 <img src="rulegraph.png" width="300" alt="Rule graph">
 
+The subfolder **Model assessment** offers scripts to test the masked language modeling loss of models.
+
 ## ⚙️ Installation
 
 ### Create Environment
