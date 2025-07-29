@@ -30,14 +30,19 @@ tokenizer = RobertaTokenizer.from_pretrained(tokenizer_path)
 # and should contain 'train', 'eval', and 'test' splits internally.
 # We are interested in the 'test' split here.
 pre_tokenized_dataset_locations = {
-    "test_HIP1": "/REDACTED/PATHroject/reddy/REDACTED/PATHnal_training_testing_val_data/Soto-HIP1/tokenized",
-    "test_HIP2": "/REDACTED/PATHroject/reddy/REDACTED/PATHnal_training_testing_val_data/Soto-HIP2/tokenized",
-    "test_HIP3": "/REDACTED/PATHroject/reddy/REDACTED/PATHnal_training_testing_val_data/Soto-HIP3/tokenized",
-    "test_OAS":  "/REDACTED/PATHroject/reddy/REDACTED/PATHnal_training_testing_val_data/OAS-wo-Soto/tokenized",
+    "test_heavy_chain": "/REDACTED/PATHroject/reddy/REDACTED/PATHretraining/heavy_chain/tokenized",
+    "test_human": "/REDACTED/PATHroject/reddy/REDACTED/PATHretraining/human/tokenized",
+    "test_human_heavy_chain": "/REDACTED/PATHroject/reddy/REDACTED/PATHretraining/human_heavy_chain/tokenized",
+    "test_human_light_chain": "/REDACTED/PATHroject/reddy/REDACTED/PATHretraining/human_light_chain/tokenized",
+    "test_human_mouse": "/REDACTED/PATHroject/reddy/REDACTED/PATHretraining/human_mouse/tokenized",
+    "test_light_chain": "/REDACTED/PATHroject/reddy/REDACTED/PATHretraining/light_chain/tokenized",
+    "test_mouse": "/REDACTED/PATHroject/reddy/REDACTED/PATHretraining/mouse/tokenized",
+    "test_mouse_heavy_chain": "/REDACTED/PATHroject/reddy/REDACTED/PATHretraining/mouse_heavy_chain/tokenized",
+    "test_mouse_light_chain": "/REDACTED/PATHroject/reddy/REDACTED/PATHretraining/mouse_light_chain/tokenized",
 }
 
 # --- Model Loading ---
-model_path = "/REDACTED/PATHroject/reddy/REDACTED/PATHnal_training_testing_val_data/OAS-wo-Soto/model/checkpoint-156250/" # Specify the path to trained model
+model_path = "/REDACTED/PATHroject/reddy/REDACTED/PATHrcentage_comparison/500k/model/checkpoint-17370" # Specify the path to trained model
 logging.info(f"Loading model: {model_path}")
 model = RobertaForMaskedLM.from_pretrained(model_path)
 model_name = model_path.split("/")[-2] # Extract model name from path
