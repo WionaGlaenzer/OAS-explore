@@ -30,10 +30,15 @@ tokenizer = RobertaTokenizer.from_pretrained(tokenizer_path)
 # and should contain 'train', 'eval', and 'test' splits internally.
 # We are interested in the 'test' split here.
 pre_tokenized_dataset_locations = {
-    "test_HIP1": "/REDACTED/PATH",
-    "test_HIP2": "/REDACTED/PATH",
-    "test_HIP3": "/REDACTED/PATH",
-    "test_OAS":  "/REDACTED/PATH",
+    "test_heavy_chain": "/REDACTED/PATH",
+    "test_human": "/REDACTED/PATH",
+    "test_human_heavy_chain": "/REDACTED/PATH",
+    "test_human_light_chain": "/REDACTED/PATH",
+    "test_human_mouse": "/REDACTED/PATH",
+    "test_light_chain": "/REDACTED/PATH",
+    "test_mouse": "/REDACTED/PATH",
+    "test_mouse_heavy_chain": "/REDACTED/PATH",
+    "test_mouse_light_chain": "/REDACTED/PATH",
 }
 
 # --- Model Loading ---

@@ -10,6 +10,5 @@ slurm*
 plots/
 results/
 wandb/
-model_assessment/
 mmseqs/
 MMseqs2/
