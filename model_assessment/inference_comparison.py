@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 from transformers import (
     RobertaConfig,
     RobertaTokenizer,
@@ -12,9 +13,13 @@ from transformers import (
 import datasets
 import os
 import logging
+import json
 
 # Configure logging to show info level messages
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+)
 datasets.disable_progress_bar() # Keep progress bars disabled if desired
 
 # --- Configuration ---
@@ -136,8 +141,8 @@ for dataset_name, dataset_path in pre_tokenized_dataset_locations.items():
         print(f"Metrics: {predictions.metrics}")
         # Perplexity is often calculated as exp(loss) for language models
         if 'eval_loss' in predictions.metrics:
-             perplexity = pd.np.exp(predictions.metrics['eval_loss'])
-             print(f"Perplexity: {perplexity:.4f}")
+             perplexity = np.exp(predictions.metrics['eval_loss'])
+            logging.info(f"Perplexity: {perplexity:.4f}")
         print("-" * 30)
 
 
@@ -153,3 +158,8 @@ for dataset_name, metrics in results.items():
         print(f"  Perplexity: {perplexity:.4f}")
 
 logging.info("Prediction process finished.")
+
+with open("prediction_results.json", "w") as f:
+    json.dump(results, f, indent=4)
+
+logging.info("Prediction results saved to prediction_results.json")

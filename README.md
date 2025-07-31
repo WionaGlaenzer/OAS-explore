@@ -77,7 +77,6 @@ snakemake
 3. Enter your personal API key (create a free W&B account if needed).  
    The Snakemake rule `train_model` will now stream metrics automatically.
 
-
 ## 🏗️ Contributing
 
 Pull requests are welcome! Please open an issue first to discuss major changes.
