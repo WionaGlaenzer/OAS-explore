@@ -131,7 +131,7 @@ test_order = [
 loss_matrix = [[model[test] for test in test_order] for model in model_order]
 
 names = test_order
-plt.figure(figsize=(10, 8))
+plt.figure(figsize=(6, 4.5))
 loss_df = pd.DataFrame(loss_matrix, index=names, columns=names)
 sns.heatmap(loss_df, annot=True, cmap="YlGnBu", cbar_kws={'label': 'Loss'}, xticklabels=names, yticklabels=names)
 plt.title("Model performance on different test sets")
