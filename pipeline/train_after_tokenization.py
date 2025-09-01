@@ -50,7 +50,7 @@ datasets.disable_progress_bar()
 
 # --- W&B Environment Variable Setup ---
 # Set these on all processes; Trainer/Wandb usually handle reporting correctly
-os.environ["WANDB_PROJECT"] = "mouse_retraining"
+os.environ["WANDB_PROJECT"] = "tanuki_continuation"
 os.environ["WANDB_ENTITY"] = "wiona-glaenzer-eth-z-rich"
 os.environ["WANDB_LOG_MODEL"] = "checkpoint" # Can be 'true', 'false', or 'checkpoint'
 
@@ -94,7 +94,7 @@ try:
         print("Loading Pre-tokenized Datasets...")
 
     # Each process loads the already tokenized dataset
-    tokenized_dataset = load_from_disk(f"/REDACTED/PATHroject/reddy/REDACTED/PATHretraining/human/tokenized")
+    tokenized_dataset = load_from_disk(f"/REDACTED/PATHroject/reddy/REDACTED/PATHnuki_continuation/Soto-All/tokenized")
 
     if is_main_process:
         print("Pre-tokenized dataset loaded.")
@@ -118,8 +118,7 @@ antiberta_config = {
     "max_len": 150,
     "max_position_embeddings": 152,
     "batch_size": 96, # This is PER DEVICE batch size
-    #"max_steps": 17362, #originally 225000
-    "num_train_epochs": 10,
+    "max_steps": 468750, #originally 225000
     "weight_decay": 0.01,
     "peak_learning_rate": 0.0001,
     "gradient_accumulation_steps": 1,
@@ -167,13 +166,13 @@ args = TrainingArguments(
     adam_epsilon=1e-6,
     weight_decay=antiberta_config.get("weight_decay", 0.01),
     warmup_steps=int(antiberta_config.get("max_steps", 1000) * 0.06), # Calculate warmup steps
-    #max_steps=antiberta_config.get("max_steps", 1000),
-    num_train_epochs=antiberta_config.get("num_train_epochs", 10),
+    max_steps=antiberta_config.get("max_steps", 1000),
+
     logging_steps=100,
-    evaluation_strategy="epoch",
-    #eval_steps=1000, # Match logging/save steps potentially
-    save_strategy="epoch", # New argument for mouse retraining
-    #save_steps=5000,
+    eval_strategy="steps",
+    eval_steps=2500, # Match logging/save steps potentially
+    save_steps=5000,
+
     #save_total_limit=5, # Optional: limit number of checkpoints
     fp16=True, # Ensure DeepSpeed config also handles fp16/bf16 settings
     # --- Deepspeed ---
@@ -190,9 +189,9 @@ args = TrainingArguments(
     # --- Logging Control ---
     # Log level already set globally for transformers/datasets logging
     # log_on_each_node=False, # Log metrics only on the main process (default is True)
-    #load_best_model_at_end=True,        # new argument for mouse retraining
-    #metric_for_best_model="train_loss",  # new argument for mouse retraining
-    #greater_is_better=False, # new argument for mouse retraining
+
+
+
 )
 
 # --- Initialize Trainer ---
@@ -221,7 +220,7 @@ if is_main_process:
     print("Starting Training...")
 
 try:
-    trainer.train()
+    trainer.train(resume_from_checkpoint=True)
     if is_main_process:
         print("Training finished.")
 except Exception as e:
@@ -266,5 +265,3 @@ if is_main_process:
 
 if is_main_process:
     print("Script execution completed successfully on main process.")
-
-# All processes exit here

@@ -48,6 +48,3 @@ plt.title("Model performance on different test sets")
 plt.xlabel("Test data")
 plt.ylabel("Training data")
 plt.savefig("loss_different_test_sets_means.pdf")
-
-
-
