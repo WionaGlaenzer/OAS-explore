@@ -1,4 +1,4 @@
-# Antibody PLM Training Pipeline
+# OAS-explore: Pipeline for data sampling and antibody PLM training
 
 A fully reproducible **Snakemake** workflow for training antibody protein‑language models (PLMs) on data from the *Observed Antibody Space* (**OAS**) database.
 
