@@ -41,16 +41,16 @@ get_CV_splits("data_file.txt", n_splits=3)
 # and should contain 'train', 'eval', and 'test' splits internally.
 # We are interested in the 'test' split here.
 pre_tokenized_dataset_locations = {
-    #"test_HIP1": "/REDACTED/PATHroject/reddy/REDACTED/PATHnal_training_testing_val_data/small_test_sets/small_HIP1",
-    "test_HIP2": "/REDACTED/PATHroject/reddy/REDACTED/PATHnal_training_testing_val_data/small_test_sets/small_HIP2",
-    #"test_HIP3": "/REDACTED/PATHroject/reddy/REDACTED/PATHnal_training_testing_val_data/small_test_sets/small_HIP3",
-    #"test_OAS": "/REDACTED/PATHroject/reddy/REDACTED/PATHnal_training_testing_val_data/small_test_sets/OAS"
+    #"test_HIP1": "/insert/your/pathfinal_training_testing_val_data/small_test_sets/small_HIP1",
+    "test_HIP2": "/insert/your/pathfinal_training_testing_val_data/small_test_sets/small_HIP2",
+    #"test_HIP3": "/insert/your/pathfinal_training_testing_val_data/small_test_sets/small_HIP3",
+    #"test_OAS": "/insert/your/pathfinal_training_testing_val_data/small_test_sets/OAS"
 }
 
-deepspeed_config_path = "/REDACTED/PATHnzer/Coding/plm_training_pipeline/assets/deepspeed_config.json" # Path to your deepspeed config file
+deepspeed_config_path = "assets/deepspeed_config.json" # Path to your deepspeed config file
 
 # --- Model Loading ---
-#model_path = "/REDACTED/PATHroject/reddy/REDACTED/PATHnal_training_testing_val_data/OAS-wo-Soto/model/checkpoint-156250/" # Specify the path to trained model
+#model_path = "/insert/your/pathfinal_training_testing_val_data/OAS-wo-Soto/model/checkpoint-156250/" # Specify the path to trained model
 logging.info(f"Loading model: {model_path}")
 model = RobertaForMaskedLM.from_pretrained(model_path)
 model_name = model_path.split("/")[-2] # Extract model name from path
@@ -66,7 +66,7 @@ collator = DataCollatorForLanguageModeling(
 eval_batch_size = 16 # Or adjust based on memory
 
 args = TrainingArguments(
-    output_dir=f"/REDACTED/PATHratch/REDACTED/PATHname}_evaluation", # Directory for prediction outputs/logs if any
+    output_dir=f"/insert/your/path/outputs/{model_name}_evaluation", # Directory for prediction outputs/logs if any
     # overwrite_output_dir=True, # Be cautious with this during prediction
     per_device_eval_batch_size=eval_batch_size,
     logging_steps=100, # Log frequency during prediction if needed

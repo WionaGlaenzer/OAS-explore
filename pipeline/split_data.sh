@@ -1,5 +1,6 @@
 #!/bin/bash
-export TMPDIR=/REDACTED/PATHroject/reddy/REDACTED/PATHr -p $TMPDIR
+export TMPDIR=/insert/your/pathtmp
+mkdir -p $TMPDIR
 
 # Input parameters
 input_file="$1"

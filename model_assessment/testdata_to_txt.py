@@ -4,7 +4,7 @@ from pipeline.data_functions import csv_to_txt
 
 def main():
     # File paths
-    folder = "/REDACTED/PATHroject/reddy/REDACTED/PATHng/held_out_individuals/excluded_individuals"
+    folder = "/insert/your/pathmodel_testing/held_out_individuals/excluded_individuals"
 
     # Transform all files from the folder to txt with the same name
     for file in os.listdir(folder):
