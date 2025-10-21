@@ -21,9 +21,9 @@ import seaborn as sns
 import random
 
 # === USER PARAMETERS =========================================================
-ROWS_PATH = Path("/REDACTED/PATH")           # CSV or Parquet containing the rows table
-#ROWS_PATH = Path("/REDACTED/PATH")
-METADATA_PATH = Path("/REDACTED/PATH")  # CSV mapping File_ID -> Subject, Author
+ROWS_PATH = Path("/insert/your/path/OAS_by_publication/OAS_wo_Soto/output/sampled_sequences_round_robin.csv")           # CSV or Parquet containing the rows table
+#ROWS_PATH = Path("/insert/your/path/OAS_by_publication/OAS_wo_Soto/output/sequences_filtered_processed.csv")
+METADATA_PATH = Path("assets/OAS_overview.csv")  # CSV mapping File_ID -> Subject, Author
 OUTPUT_PLOT = Path("rows_per_Subject.pdf")   # Where to save the bar‑plot PNG
 N_WORKERS = None                                # Set to None to disable the local cluster
 CACHED_COUNTS = Path("counts_with_meta.csv")     # Cached intermediate CSV

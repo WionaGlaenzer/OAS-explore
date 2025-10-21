@@ -26,7 +26,7 @@ datasets.disable_progress_bar() # Keep progress bars disabled if desired
 
 # Initialize the tokenizer (still needed for the data collator)
 # Make sure this is the *same* tokenizer used to pre-tokenize your datasets
-tokenizer_path = assets/antibody-tokenizer
+tokenizer_path = "assets/antibody-tokenizer"
 logging.info(f"Loading tokenizer from: {tokenizer_path}")
 tokenizer = RobertaTokenizer.from_pretrained(tokenizer_path)
 
@@ -35,19 +35,19 @@ tokenizer = RobertaTokenizer.from_pretrained(tokenizer_path)
 # and should contain 'train', 'eval', and 'test' splits internally.
 # We are interested in the 'test' split here.
 pre_tokenized_dataset_locations = {
-    "test_heavy_chain": "/REDACTED/PATH",
-    "test_human": "/REDACTED/PATH",
-    "test_human_heavy_chain": "/REDACTED/PATH",
-    "test_human_light_chain": "/REDACTED/PATH",
-    "test_human_mouse": "/REDACTED/PATH",
-    "test_light_chain": "/REDACTED/PATH",
-    "test_mouse": "/REDACTED/PATH",
-    "test_mouse_heavy_chain": "/REDACTED/PATH",
-    "test_mouse_light_chain": "/REDACTED/PATH",
+    "test_heavy_chain": "/insert/your/pathmouse_retraining/heavy_chain/tokenized",
+    "test_human": "/insert/your/pathmouse_retraining/human/tokenized",
+    "test_human_heavy_chain": "/insert/your/pathmouse_retraining/human_heavy_chain/tokenized",
+    "test_human_light_chain": "/insert/your/pathmouse_retraining/human_light_chain/tokenized",
+    "test_human_mouse": "/insert/your/pathmouse_retraining/human_mouse/tokenized",
+    "test_light_chain": "/insert/your/pathmouse_retraining/light_chain/tokenized",
+    "test_mouse": "/insert/your/pathmouse_retraining/mouse/tokenized",
+    "test_mouse_heavy_chain": "/insert/your/pathmouse_retraining/mouse_heavy_chain/tokenized",
+    "test_mouse_light_chain": "/insert/your/pathmouse_retraining/mouse_light_chain/tokenized",
 }
 
 # --- Model Loading ---
-model_path = "/REDACTED/PATH" # Specify the path to trained model
+model_path = "/insert/your/pathmouse_percentage_comparison/500k/model/checkpoint-17370" # Specify the path to trained model
 logging.info(f"Loading model: {model_path}")
 model = RobertaForMaskedLM.from_pretrained(model_path)
 model_name = model_path.split("/")[-2] # Extract model name from path
@@ -63,7 +63,7 @@ collator = DataCollatorForLanguageModeling(
 eval_batch_size = 96 # Or adjust based on memory
 
 args = TrainingArguments(
-    output_dir=f"/REDACTED/PATH", # Directory for prediction outputs/logs if any
+    output_dir=f"/insert/your/path/outputs/{model_name}_evaluation", # Directory for prediction outputs/logs if any
     # overwrite_output_dir=True, # Be cautious with this during prediction
     per_device_eval_batch_size=eval_batch_size,
     logging_steps=100, # Log frequency during prediction if needed
@@ -141,7 +141,7 @@ for dataset_name, dataset_path in pre_tokenized_dataset_locations.items():
         print(f"Metrics: {predictions.metrics}")
         # Perplexity is often calculated as exp(loss) for language models
         if 'eval_loss' in predictions.metrics:
-             perplexity = np.exp(predictions.metrics['eval_loss'])
+            perplexity = np.exp(predictions.metrics['eval_loss'])
             logging.info(f"Perplexity: {perplexity:.4f}")
         print("-" * 30)
 

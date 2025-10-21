@@ -94,7 +94,7 @@ try:
         print("Loading Pre-tokenized Datasets...")
 
     # Each process loads the already tokenized dataset
-    tokenized_dataset = load_from_disk(f"/REDACTED/PATH")
+    tokenized_dataset = load_from_disk(f"/insert/your/path/tanuki_continuation/Soto-All/tokenized")
 
     if is_main_process:
         print("Pre-tokenized dataset loaded.")
