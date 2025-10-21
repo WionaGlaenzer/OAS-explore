@@ -133,7 +133,7 @@ rule download_data:
             shell("bash pipeline/download.sh {input.data_list} {output} {params.n_lines} {col_numbers} {params.download_dir}")
         else:
             logging.info("Length filtering is disabled. Downloading all sequences.")
-            shell("bash download_no_length_filter.sh {input.data_list} {output} {params.n_lines} {col_numbers} {params.download_dir}")
+            shell("bash pipeline/download_no_length_filter.sh {input.data_list} {output} {params.n_lines} {col_numbers} {params.download_dir}")
 
 rule csv_to_fasta:
     """
