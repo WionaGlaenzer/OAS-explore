@@ -91,7 +91,11 @@ rule all:
         #f"{output_dir}/sampled_sequences_round_robin.csv",
         #directory(f"{output_dir}/model/"),
         #f"{output_dir}/sequences_per_individual/.done"
+<<<<<<< HEAD
         #get_final_targets(wildcards)
+=======
+        get_final_targets(wildcards)
+>>>>>>> 3bf9cf6 (reorganization and stages in config)
 
 rule select_files_to_download:
     """
@@ -337,10 +341,16 @@ rule split_data:
         test = f"{output_dir}/test_set.txt"
     params:
         training_fraction = config["training_fraction"],
+<<<<<<< HEAD
         validation_fraction = config["validation_fraction"],
         split_mode = config.get("split_mode", "fraction")
     shell:
         "bash pipeline/split_data.sh {input.sequences_csv} {output.training} {output.validation} {output.test} {params.training_fraction} {params.validation_fraction} 0 {output_dir} {params.split_mode}"
+=======
+        validation_fraction = config["validation_fraction"]
+    run:
+        shell(f"bash pipeline/split_data.sh {input.sequences_csv} {output.training} {output.validation} {output.test} {params.training_fraction} {params.validation_fraction} 0 {output_dir}")
+>>>>>>> 3bf9cf6 (reorganization and stages in config)
 
 #rule csv_to_txt:
 #    """
