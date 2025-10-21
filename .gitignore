@@ -5,6 +5,7 @@ downloading/
 outputs/
 linclust/
 slurm*
+<<<<<<< HEAD
 *.pdf
 *.png
 plots/
@@ -15,3 +16,8 @@ MMseqs2/
 pipeline/bin/
 pipeline/lib/
 pipeline/pyvenv.cfg
+=======
+results/
+wandb/
+mmseqs/
+>>>>>>> 3bf9cf6 (reorganization and stages in config)

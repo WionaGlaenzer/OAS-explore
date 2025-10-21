@@ -13,7 +13,11 @@ import datasets
 import os
 import logging
 import argparse
+<<<<<<< HEAD
 from pipeline.testing_functions import get_CV_splits
+=======
+from testing_functions import get_CV_splits
+>>>>>>> 3bf9cf6 (reorganization and stages in config)
 
 # Read model name from command line argument
 parser = argparse.ArgumentParser(description="Model name for evaluation")
