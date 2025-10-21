@@ -4,16 +4,15 @@
 # Define paths and names here for easy modification.
 # Using export makes these variables available to the sbatch command's environment,
 # and Slurm can then pass them to the job script environment.
-#export PROJECT_BASE="/REDACTED/PATH"
-export PROJECT_BASE="/REDACTED/PATH"
+export PROJECT_BASE="insert/path/to/your/project/directory" # Base project directory
 export MODEL_DIR="${PROJECT_BASE}/model"
 export WANDB_LOG_DIR="${MODEL_DIR}/wandb_logs" # W&B log directory
-export VENV_PATH="/REDACTED/PATH"
-export CODE_BASE="/REDACTED/PATH"
+export VENV_PATH="insert/path/to/your/venv/bin/activate" # Path to the Python virtual environment activation script
+export CODE_BASE="insert/path/to/your/snakemake/repository" # Base code directory
 export ASSETS_DIR="${CODE_BASE}/assets"
 export TOKENIZER_PATH="${ASSETS_DIR}/antibody-tokenizer"
 export DEEPSPEED_CONFIG_PATH="${ASSETS_DIR}/deepspeed_stage2_config.json"
-export CACHE_DIR="/REDACTED/PATH"
+export CACHE_DIR="insert/path/to/cache/directory/for/huggingface" # Directory for Huggingface cache
 export MODEL_NAME="mouse_model"
 export DONE_FILE_PATH="${MODEL_DIR}/.done"
 export TRAIN_FILE="${PROJECT_BASE}/training.txt"
@@ -75,12 +74,12 @@ if [[ -z "${WANDB_LOG_DIR}" ]]; then
   exit 1
 fi
 export TORCH_USE_CUDA_DSA=1
-export WANDB_DIR=/REDACTED/PATHroject/reddy/REDACTED/PATHndb_logs
+export WANDB_DIR=/insert/path/to/your/wandb/log/directory # Directory for W&B logs
 # Directory for caching artifacts, etc. (use scratch space)
-export WANDB_CACHE_DIR=/REDACTED/PATHratch/REDACTED/PATHndb_cache
+export WANDB_CACHE_DIR=/insert/path/to/your/wandb/cache/directory
 # Optional: Directory for config files (use project space)
-export WANDB_CONFIG_DIR=/REDACTED/PATHroject/reddy/REDACTED/PATHnfig/wandb
-export TORCH_EXTENSIONS_DIR=/REDACTED/PATHratch/REDACTED/PATHrch_extensions
+export WANDB_CONFIG_DIR=/insert/path/to/your/wandb/config/directory
+export TORCH_EXTENSIONS_DIR=/insert/path/to/your/torch/extensions/directory # Directory for Torch extensionss
 
 
 # Make sure directories exist
@@ -120,7 +119,7 @@ sbatch -A es_reddy --job-name="${JOB_NAME}" \
     \"${MODEL_NAME}\" \
     \"${DONE_FILE_PATH}\" \
     \"${TOKENIZER_PATH}\" \
-    "/REDACTED/PATH" \
+    "assets/deepspeed_stage2_config.json" \
     --deepspeed_config \"${DEEPSPEED_CONFIG_PATH}\""
 
 # Check if sbatch command succeeded

@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 from transformers import (
     RobertaConfig,
     RobertaTokenizer,
@@ -13,13 +12,18 @@ from transformers import (
 import datasets
 import os
 import logging
-import json
+import argparse
+from pipeline.testing_functions import get_CV_splits
+
+# Read model name from command line argument
+parser = argparse.ArgumentParser(description="Model name for evaluation")
+parser.add_argument("--model_path", type=str, required=True, help="Name of the model to evaluate")
+args = parser.parse_args()
+model_path = args.model_path
+print(f"Model name: {model_path}")
 
 # Configure logging to show info level messages
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(levelname)s - %(message)s",
-)
+logging.basicConfig(level=logging.INFO)
 datasets.disable_progress_bar() # Keep progress bars disabled if desired
 
 # --- Configuration ---
@@ -30,24 +34,23 @@ tokenizer_path = assets/antibody-tokenizer
 logging.info(f"Loading tokenizer from: {tokenizer_path}")
 tokenizer = RobertaTokenizer.from_pretrained(tokenizer_path)
 
+get_CV_splits("data_file.txt", n_splits=3)
+
 # --- Define paths to your PRE-TOKENIZED dataset FOLDERS ---
 # Each path should be a directory containing the saved dataset (e.g., created with dataset.save_to_disk())
 # and should contain 'train', 'eval', and 'test' splits internally.
 # We are interested in the 'test' split here.
 pre_tokenized_dataset_locations = {
-    "test_heavy_chain": "/REDACTED/PATH",
-    "test_human": "/REDACTED/PATH",
-    "test_human_heavy_chain": "/REDACTED/PATH",
-    "test_human_light_chain": "/REDACTED/PATH",
-    "test_human_mouse": "/REDACTED/PATH",
-    "test_light_chain": "/REDACTED/PATH",
-    "test_mouse": "/REDACTED/PATH",
-    "test_mouse_heavy_chain": "/REDACTED/PATH",
-    "test_mouse_light_chain": "/REDACTED/PATH",
+    #"test_HIP1": "/REDACTED/PATH",
+    "test_HIP2": "/REDACTED/PATH",
+    #"test_HIP3": "/REDACTED/PATH",
+    #"test_OAS": "/REDACTED/PATH"
 }
 
+deepspeed_config_path = "/REDACTED/PATH" # Path to your deepspeed config file
+
 # --- Model Loading ---
-model_path = "/REDACTED/PATH" # Specify the path to trained model
+#model_path = "/REDACTED/PATH" # Specify the path to trained model
 logging.info(f"Loading model: {model_path}")
 model = RobertaForMaskedLM.from_pretrained(model_path)
 model_name = model_path.split("/")[-2] # Extract model name from path
@@ -60,7 +63,7 @@ collator = DataCollatorForLanguageModeling(
 
 # --- Training Arguments (used by Trainer, some args might be less relevant for prediction) ---
 # Consider adjusting batch size for evaluation if needed
-eval_batch_size = 96 # Or adjust based on memory
+eval_batch_size = 16 # Or adjust based on memory
 
 args = TrainingArguments(
     output_dir=f"/REDACTED/PATH", # Directory for prediction outputs/logs if any
@@ -84,6 +87,7 @@ args = TrainingArguments(
     disable_tqdm=True, # Keep progress bars disabled if desired
     dataloader_num_workers=2, # Optional: speed up data loading
     remove_unused_columns=False, # Important: Keep all columns from the pre-tokenized dataset for the collator
+    deepspeed=deepspeed_config_path,
 )
 
 # --- Initialize Trainer (once) ---
@@ -141,8 +145,8 @@ for dataset_name, dataset_path in pre_tokenized_dataset_locations.items():
         print(f"Metrics: {predictions.metrics}")
         # Perplexity is often calculated as exp(loss) for language models
         if 'eval_loss' in predictions.metrics:
-             perplexity = np.exp(predictions.metrics['eval_loss'])
-            logging.info(f"Perplexity: {perplexity:.4f}")
+             perplexity = pd.np.exp(predictions.metrics['eval_loss'])
+             print(f"Perplexity: {perplexity:.4f}")
         print("-" * 30)
 
 
@@ -158,8 +162,3 @@ for dataset_name, metrics in results.items():
         print(f"  Perplexity: {perplexity:.4f}")
 
 logging.info("Prediction process finished.")
-
-with open("prediction_results.json", "w") as f:
-    json.dump(results, f, indent=4)
-
-logging.info("Prediction results saved to prediction_results.json")

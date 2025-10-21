@@ -29,7 +29,7 @@ datasets.disable_progress_bar() # Keep progress bars disabled if desired
 
 # Initialize the tokenizer (still needed for the data collator)
 # Make sure this is the *same* tokenizer used to pre-tokenize your datasets
-tokenizer_path = "/REDACTED/PATH"
+tokenizer_path = assets/antibody-tokenizer
 logging.info(f"Loading tokenizer from: {tokenizer_path}")
 tokenizer = RobertaTokenizer.from_pretrained(tokenizer_path)
 

@@ -86,7 +86,6 @@ rule all:
         f"{output_dir}/test_set.txt",
         f"{output_dir}/training_set.txt",
         #f"{output_dir}/training.txt",
-        #"/REDACTED/PATH"
         #f"{output_dir}/download_progress.txt",
         #f"{output_dir}/sampled_sequences_round_robin.csv",
         #directory(f"{output_dir}/model/"),
