@@ -2,6 +2,8 @@
 
 A fully reproducible **Snakemake** workflow for training antibody protein‑language models (PLMs) on data from the *Observed Antibody Space* (**OAS**) database.
 
+Publication link: https://openreview.net/pdf?id=JkKS5vvWLd
+
 ## ✨ Key Features
 
 - **End‑to‑end workflow** – from raw OAS downloads to trained models.
