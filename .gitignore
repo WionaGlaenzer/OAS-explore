@@ -12,3 +12,6 @@ results/
 wandb/
 mmseqs/
 MMseqs2/
+pipeline/bin/
+pipeline/lib/
+pipeline/pyvenv.cfg
