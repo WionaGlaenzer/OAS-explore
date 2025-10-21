@@ -11,19 +11,9 @@ pipeline_stages:
 
 ###### File paths #####
 
-<<<<<<< HEAD
 download_dir: "/REDACTED/PATHroject/reddy/REDACTED/PATHretraining/human_heavy_chain/download"
 output_dir: "/REDACTED/PATHroject/reddy/REDACTED/PATHretraining/human_heavy_chain/output"
 linclust_dir: "/REDACTED/PATHroject/reddy/REDACTED/PATHretraining/human_heavy_chain/linclust"
-=======
-download_dir: "/REDACTED/PATHroject/reddy/REDACTED/PATHne_revisions/human/download"
-output_dir: "/REDACTED/PATHroject/reddy/REDACTED/PATHne_revisions/human/output"
-linclust_dir: "/REDACTED/PATHroject/reddy/REDACTED/PATHne_revisions/human/linclust"
-
-#output_dir: "/REDACTED/PATHroject/reddy/REDACTED/PATHn/OAS_wo_Soto/output"
-#download_dir: "/REDACTED/PATHroject/reddy/REDACTED/PATHn/OAS_wo_Soto/download"
-#linclust_dir: "/REDACTED/PATHroject/reddy/REDACTED/PATHn/OAS_wo_Soto/linclust"
->>>>>>> 3bf9cf6 (reorganization and stages in config)
 cache_dir: "/REDACTED/PATHratch/REDACTED/PATHngface_cache"
 training_environment: "/REDACTED/PATHroject/reddy/REDACTED/PATHnvironments/training"
 wandb_base_dir: "/REDACTED/PATHroject/reddy/REDACTED/PATHretraining"
@@ -45,7 +35,6 @@ linclust:
 filters:
   Species:
     #- "rabbit"
-<<<<<<< HEAD
     - "human"
     #- "mouse_C57BL/6"
     #- "mouse_BALB/c"
@@ -54,18 +43,6 @@ filters:
     #- "Kymouse"
     #- "mouse_Swiss-Webster"
     #- "mouse_RAG2-GFP/129Sve"
-=======
-    #- "mouse_C57BL/6"
-    #- "mouse_BALB/c"
-    #- "mouse"
-    #- "Kymouse"
-    #- "HIS-Mouse"
-    #- "mouse_RAG2-GFP/129Sve"
-    #- "mouse_Swiss-Webster"
-    - "human"
-
-
->>>>>>> 3bf9cf6 (reorganization and stages in config)
   #Author: # Use the publication name as it appears on OAS
     #- 'Bashford et al., 2013'
     #- 'Bender et al., 2020'
