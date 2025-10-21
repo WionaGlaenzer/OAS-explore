@@ -4,16 +4,15 @@
 # Define paths and names here for easy modification.
 # Using export makes these variables available to the sbatch command's environment,
 # and Slurm can then pass them to the job script environment.
-#export PROJECT_BASE="/REDACTED/PATHroject/reddy/REDACTED/PATHnal_training_testing_val_data/Soto-HIP1"
-export PROJECT_BASE="/REDACTED/PATHroject/reddy/REDACTED/PATHnal_training_testing_val_data/OAS-wo-Soto"
+export PROJECT_BASE="insert/path/to/your/project/directory" # Base project directory
 export MODEL_DIR="${PROJECT_BASE}/model"
 export WANDB_LOG_DIR="${MODEL_DIR}/wandb_logs" # W&B log directory
-export VENV_PATH="/REDACTED/PATHroject/reddy/REDACTED/PATHnvironments/training/bin/activate"
-export CODE_BASE="/REDACTED/PATHnzer/Coding/plm_training_pipeline"
+export VENV_PATH="insert/path/to/your/venv/bin/activate" # Path to the Python virtual environment activation script
+export CODE_BASE="path/where/snakemake/repository/is/located" # Base code directory
 export ASSETS_DIR="${CODE_BASE}/assets"
 export TOKENIZER_PATH="${ASSETS_DIR}/antibody-tokenizer"
 export DEEPSPEED_CONFIG_PATH="${ASSETS_DIR}/deepspeed_stage2_config.json"
-export CACHE_DIR="/REDACTED/PATHratch/REDACTED/PATHngface_cache"
+export CACHE_DIR="insert/path/to/cache/directory/for/huggingface" # Directory for Huggingface cache
 export MODEL_NAME="OAS_model"
 export DONE_FILE_PATH="${MODEL_DIR}/.done"
 export TRAIN_FILE="${PROJECT_BASE}/training.txt"
@@ -75,12 +74,12 @@ if [[ -z "${WANDB_LOG_DIR}" ]]; then
   exit 1
 fi
 export TORCH_USE_CUDA_DSA=1
-export WANDB_DIR=/REDACTED/PATHroject/reddy/REDACTED/PATHndb_logs
+export WANDB_DIR=/insert/path/to/your/wandb/log/directory # Directory for W&B logs
 # Directory for caching artifacts, etc. (use scratch space)
-export WANDB_CACHE_DIR=/REDACTED/PATHratch/REDACTED/PATHndb_cache
+export WANDB_CACHE_DIR=/insert/path/to/your/wandb/cache/directory
 # Optional: Directory for config files (use project space)
-export WANDB_CONFIG_DIR=/REDACTED/PATHroject/reddy/REDACTED/PATHnfig/wandb
-export TORCH_EXTENSIONS_DIR=/REDACTED/PATHratch/REDACTED/PATHrch_extensions
+export WANDB_CONFIG_DIR=/insert/path/to/your/wandb/config/directory
+export TORCH_EXTENSIONS_DIR=/insert/path/to/your/torch/extensions/directory # Directory for Torch extensions
 
 
 # Make sure directories exist
@@ -111,7 +110,7 @@ sbatch -A es_reddy --job-name="${JOB_NAME}" \
     --export=ALL \
     --wrap="python -m torch.distributed.run \
     --nproc_per_node=\$SLURM_GPUS_ON_NODE \
-    model_assessment/inference_comparison_test.py --model_path \"/REDACTED/PATHroject/reddy/REDACTED/PATHnal_training_testing_val_data/OAS-wo-Soto/model/checkpoint-156250\""
+    model_assessment/inference_comparison_test.py --model_path \"insert/path/to/your/model/checkpoint\""
 
 # Check if sbatch command succeeded
 if [ $? -eq 0 ]; then

@@ -82,10 +82,10 @@ logging.info(f"Per-device eval batch size: {eval_batch_size}")
 
 # --- Define paths to your PRE-TOKENIZED dataset FOLDERS ---
 pre_tokenized_dataset_locations = {
-    "test_HIP1": "/REDACTED/PATHroject/reddy/REDACTED/PATHnal_training_testing_val_data/small_test_sets/small_HIP1",
-    "test_HIP2": "/REDACTED/PATHroject/reddy/REDACTED/PATHnal_training_testing_val_data/small_test_sets/small_HIP2",
-    "test_HIP3": "/REDACTED/PATHroject/reddy/REDACTED/PATHnal_training_testing_val_data/small_test_sets/small_HIP3",
-    "test_OAS": "/REDACTED/PATHroject/reddy/REDACTED/PATHnal_training_testing_val_data/small_test_sets/OAS"
+    "test_HIP1": "/insert/dataset/path",
+    "test_HIP2": "/insert/dataset/path",
+    "test_HIP3": "/insert/dataset/path",
+    "test_OAS": "/insert/dataset/path"
 }
 
 # --- Tokenizer and Collator ---

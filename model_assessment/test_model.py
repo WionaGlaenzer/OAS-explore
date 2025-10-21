@@ -13,6 +13,7 @@ import datasets
 import os
 import logging
 import argparse
+from pipeline.testing_functions import get_CV_splits
 
 # Read model name from command line argument
 parser = argparse.ArgumentParser(description="Model name for evaluation")
@@ -32,6 +33,8 @@ datasets.disable_progress_bar() # Keep progress bars disabled if desired
 tokenizer_path = assets/antibody-tokenizer
 logging.info(f"Loading tokenizer from: {tokenizer_path}")
 tokenizer = RobertaTokenizer.from_pretrained(tokenizer_path)
+
+get_CV_splits("data_file.txt", n_splits=3)
 
 # --- Define paths to your PRE-TOKENIZED dataset FOLDERS ---
 # Each path should be a directory containing the saved dataset (e.g., created with dataset.save_to_disk())

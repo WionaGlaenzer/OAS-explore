@@ -4,19 +4,18 @@
 # Define paths and names here for easy modification.
 # Using export makes these variables available to the sbatch command's environment,
 # and Slurm can then pass them to the job script environment.
-#export PROJECT_BASE="/REDACTED/PATHroject/reddy/REDACTED/PATHnal_training_testing_val_data/Soto-HIP1"
 
-export VENV_PATH="/REDACTED/PATHroject/reddy/REDACTED/PATHnvironments/training/bin/activate"
-export CODE_BASE="/REDACTED/PATHnzer/Coding/plm_training_pipeline"
+export VENV_PATH="insert/path/to/your/venv/bin/activate" # Path to the Python virtual environment activation script
+export CODE_BASE="path/where/snakemake/repository/is/located" # Base code directory
 export ASSETS_DIR="${CODE_BASE}/assets"
 export TOKENIZER_PATH="${ASSETS_DIR}/antibody-tokenizer"
-export CACHE_DIR="/REDACTED/PATHratch/REDACTED/PATHngface_cache"
+export CACHE_DIR="/insert/cache/directory/for/huggingface" # Directory for Huggingface cache
 
 # --- Slurm Configuration ---
 JOB_NAME="test_${MODEL_NAME}"
 
 # --- Model Configuration ---
-MODEL_PATH="/REDACTED/PATHroject/reddy/REDACTED/PATHnal_training_testing_val_data/Soto-HIP1/model/checkpoint-156250"
+MODEL_PATH="insert/path/to/your/model/checkpoint" # Path to the model checkpoint directory
 
 # --- Environment Modules & CUDA ---
 echo "Loading modules..."
