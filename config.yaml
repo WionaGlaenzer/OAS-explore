@@ -11,12 +11,12 @@ pipeline_stages:
 
 ###### File paths #####
 
-download_dir: "/REDACTED/PATHroject/reddy/REDACTED/PATHretraining/human_heavy_chain/download"
-output_dir: "/REDACTED/PATHroject/reddy/REDACTED/PATHretraining/human_heavy_chain/output"
-linclust_dir: "/REDACTED/PATHroject/reddy/REDACTED/PATHretraining/human_heavy_chain/linclust"
-cache_dir: "/REDACTED/PATHratch/REDACTED/PATHngface_cache"
-training_environment: "/REDACTED/PATHroject/reddy/REDACTED/PATHnvironments/training"
-wandb_base_dir: "/REDACTED/PATHroject/reddy/REDACTED/PATHretraining"
+download_dir: "insert/path/to/download/data"
+output_dir: "insert/path/to/save/outputs"
+linclust_dir: "insert/path/to/linclust/installation"
+cache_dir: "insert/path/to/cache/directory"
+training_environment: "insert/path/to/training/environment"
+wandb_base_dir: "insert/path/for/wandb/logs"
 
 ###### Data filtering #####
 
@@ -203,11 +203,11 @@ split_mode: "numbers"
 
 model_name: "human_light_model_test"
 
-tokenizer: "/REDACTED/PATHnzer/Coding/plm_training_pipeline/assets/antibody-tokenizer"
+tokenizer: "/assets/antibody_tokenizer"
 
-deepspeed_config: "/REDACTED/PATHnzer/Coding/plm_training_pipeline/assets/deepspeed_config.json"
+deepspeed_config: "assets/deepspeed_config.json"
 
 ###### Test settings #####
 
 n_splits: 5
-testing_environment: "/REDACTED/PATHroject/reddy/REDACTED/PATHnvironments/model-testing"
+testing_environment: "/insert/path/to/testing/environment"
