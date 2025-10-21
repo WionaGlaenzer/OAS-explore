@@ -11,12 +11,12 @@ pipeline_stages:
 
 ###### File paths #####
 
-download_dir: "/REDACTED/PATH"
-output_dir: "/REDACTED/PATH"
-linclust_dir: "/REDACTED/PATH"
-cache_dir: "/REDACTED/PATH"
-training_environment: "/REDACTED/PATH"
-wandb_base_dir: "/REDACTED/PATH"
+download_dir: "insert/path/to/download/data"
+output_dir: "insert/path/to/save/outputs"
+linclust_dir: "insert/path/to/linclust/installation"
+cache_dir: "insert/path/to/cache/directory"
+training_environment: "insert/path/to/training/environment"
+wandb_base_dir: "insert/path/for/wandb/logs"
 
 ###### Data filtering #####
 
@@ -203,11 +203,11 @@ split_mode: "numbers"
 
 model_name: "human_light_model_test"
 
-tokenizer: "/REDACTED/PATH"
+tokenizer: "/assets/antibody_tokenizer"
 
-deepspeed_config: "/REDACTED/PATH"
+deepspeed_config: "assets/deepspeed_config.json"
 
 ###### Test settings #####
 
 n_splits: 5
-testing_environment: "/REDACTED/PATH"
+testing_environment: "/insert/path/to/testing/environment"
