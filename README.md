@@ -53,6 +53,12 @@ source training/bin/activate
 pip install -r requirements-training.txt
 ```
 
+### Update parameters
+
+Update the parameters in the **File paths** section of the *config.yaml* file with your paths.
+Also update "rule all: input:" in the Snakefile to only run the parts of the pipeline you want to run. It is advisable to try data processing first and then run training after inspecting the data.
+
+
 ## 🚀 Running the Pipeline
 
 ```bash
