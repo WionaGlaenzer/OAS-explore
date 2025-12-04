@@ -4,3 +4,5 @@ pandas
 matplotlib
 dask
 cmake
+datasets
+transformers

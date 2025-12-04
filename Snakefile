@@ -75,26 +75,21 @@ def get_final_targets(wildcards):
 
 rule all:
     input:
-        #f"{output_dir}/sequences.csv",
-        #f"{output_dir}/data_to_download.csv",
-        #f"{output_dir}/sequences.fasta",
-        #f"{linclust_dir}/antibody_DB_clu_rep.fasta",
-        #f"{output_dir}/sequences_filtered.csv",
-        #f"{output_dir}/sequences_filtered_processed.csv",
-        #f"{output_dir}/number_of_seqs_per_individual.csv",
+        f"{output_dir}/sequences.csv",
+        f"{output_dir}/data_to_download.csv",
+        f"{output_dir}/sequences.fasta",
+        f"{linclust_dir}/antibody_DB_clu_rep.fasta",
+        f"{output_dir}/sequences_filtered.csv",
+        f"{output_dir}/sequences_filtered_processed.csv",
+        f"{output_dir}/number_of_seqs_per_individual.csv",
         f"{output_dir}/sampled_sequences.csv",
-        f"{output_dir}/test_set.txt",
-        f"{output_dir}/training_set.txt",
-        #f"{output_dir}/training.txt",
+        f"{output_dir}/test.txt",
+        f"{output_dir}/training.txt",
         #f"{output_dir}/download_progress.txt",
-        #f"{output_dir}/sampled_sequences_round_robin.csv",
-        #directory(f"{output_dir}/model/"),
-        #f"{output_dir}/sequences_per_individual/.done"
-<<<<<<< HEAD
+        f"{output_dir}/sampled_sequences_round_robin.csv",
+        directory(f"{output_dir}/model/"),
+        f"{output_dir}/sequences_per_individual/.done"
         #get_final_targets(wildcards)
-=======
-        get_final_targets(wildcards)
->>>>>>> 3bf9cf6 (reorganization and stages in config)
 
 rule select_files_to_download:
     """
@@ -187,7 +182,7 @@ rule process_anarci_column:
     also completes a second round of length filtering.
     """
     input:
-        sequences_csv = f"{output_dir}/sequences_filtered1.csv"
+        sequences_csv = f"{output_dir}/sequences_filtered.csv"
     output:
         filename = f"{output_dir}/sequences_filtered_processed.csv"    
     params:
@@ -335,22 +330,15 @@ rule split_data:
     input:
         sequences_csv = f"{output_dir}/sampled_sequences.csv"
     output:
-        training = f"{output_dir}/training_set.txt",
-        validation = f"{output_dir}/validation_set.txt",
-        test = f"{output_dir}/test_set.txt"
+        training = f"{output_dir}/training.txt",
+        validation = f"{output_dir}/validation.txt",
+        test = f"{output_dir}/test.txt"
     params:
         training_fraction = config["training_fraction"],
-<<<<<<< HEAD
         validation_fraction = config["validation_fraction"],
         split_mode = config.get("split_mode", "fraction")
     shell:
         "bash pipeline/split_data.sh {input.sequences_csv} {output.training} {output.validation} {output.test} {params.training_fraction} {params.validation_fraction} 0 {output_dir} {params.split_mode}"
-=======
-        validation_fraction = config["validation_fraction"]
-    run:
-        shell(f"bash pipeline/split_data.sh {input.sequences_csv} {output.training} {output.validation} {output.test} {params.training_fraction} {params.validation_fraction} 0 {output_dir}")
->>>>>>> 3bf9cf6 (reorganization and stages in config)
-
 #rule csv_to_txt:
 #    """
 #    Converts the training, validation, and test sets to txt files containing only the sequences without metadata.

@@ -26,8 +26,8 @@ module load stack/2024-06  gcc/12.2.0
 module load python/3.11.6  cuda/12.1.1  ninja/1.11.1
 
 # 2. Create and activate the Snakemake environment
-python3.11 -m venv pipeline
-source pipeline/bin/activate
+python3.11 -m venv pipeline-env
+source pipeline-env/bin/activate
 
 # 3. Install pipeline dependencies
 pip install --upgrade pip
